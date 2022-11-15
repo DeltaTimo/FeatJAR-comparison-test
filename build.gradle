@@ -12,8 +12,10 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 
-    implementation 'org.sat4j:core:2.3.5'
     implementation 'org.antlr:antlr:3.4'
+    // implementation 'org.sat4j:org.sat4j.core:2.3.1'
+    implementation files('libs/org.sat4j.core.jar')
+    implementation files('libs/uvl-parser.jar')
     implementation files('libs/de.ovgu.featureide.lib.fm-v3.9.0.jar')
 }
 
