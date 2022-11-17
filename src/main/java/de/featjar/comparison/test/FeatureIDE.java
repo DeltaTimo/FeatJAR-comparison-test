@@ -3,7 +3,13 @@ package de.featjar.comparison.test;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import org.prop4j.Implies;
 import org.prop4j.Literal;
 import org.prop4j.Node;
@@ -22,17 +28,11 @@ import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 public class FeatureIDE implements ITestLibrary {
     @Override
     public Result<Boolean> isTautology(String filePath) {
-        LibraryManager.registerLibrary(FMCoreLibrary.getInstance());
-        final Path path = Paths.get(filePath);
-        final IFeatureModel featureModel = FeatureModelManager.load(path);
+        final IFeatureModel featureModel = loadModel(filePath);
         if (featureModel != null) {
             FeatureModelFormula formula = new FeatureModelFormula(featureModel);
             final FeatureModelAnalyzer analyzer = formula.getAnalyzer();
             analyzer.analyzeFeatureModel(null);
-            System.out.println("Feature model is " + (analyzer.isValid(null) ? "not " : "") + "void");
-            System.out.println("Dead features: " + analyzer.getDeadFeatures(null));
-            System.out.println(analyzer.getExplanation(featureModel.getFeature("Bluetooth")));
-
             final SimpleSatSolver solver = new SimpleSatSolver(formula.getCNF());
             final Node query = new Implies(new Literal("Navigation"), new Literal("Ports"));
             System.out.print("Is \"FM => (" + query + ")\" a tautology? ");
@@ -56,4 +56,66 @@ public class FeatureIDE implements ITestLibrary {
         }
         return new Result<>();
     }
+
+    @Override
+    public Result<Boolean> isVoid(String filePath) {
+        final IFeatureModel featureModel = loadModel(filePath);
+        if (featureModel != null) {
+            FeatureModelFormula formula = new FeatureModelFormula(featureModel);
+            final FeatureModelAnalyzer analyzer = formula.getAnalyzer();
+            analyzer.analyzeFeatureModel(null);
+            if(analyzer.isValid(null))  return new Result<>(false);
+            return new Result<>(true);
+        }
+        return new Result<>();
+    }
+
+    @Override
+    public Result<Set<String>> coreFeatures(String filePath) {
+        final IFeatureModel featureModel = loadModel(filePath);
+        if (featureModel != null) {
+            FeatureModelFormula formula = new FeatureModelFormula(featureModel);
+            final FeatureModelAnalyzer analyzer = formula.getAnalyzer();
+            List<IFeature> core = analyzer.getCoreFeatures(null);
+            Set<String> result = new HashSet<>();
+            core.forEach(iFeature -> result.add(iFeature.toString()));
+            return new Result<>(result);
+        }
+        return new Result<>();
+    }
+
+    @Override
+    public Result<Set<String>> deadFeatures(String filePath) {
+        final IFeatureModel featureModel = loadModel(filePath);
+        if (featureModel != null) {
+            FeatureModelFormula formula = new FeatureModelFormula(featureModel);
+            final FeatureModelAnalyzer analyzer = formula.getAnalyzer();
+            List<IFeature> dead = analyzer.getDeadFeatures(null);
+            Set<String> result = new HashSet<>();
+            dead.forEach(iFeature -> result.add(iFeature.toString()));
+            return new Result<>(result);
+        }
+        return new Result<>();
+    }
+
+    @Override
+    public Result<Set<String>> falseOptional(String filePath) {
+        final IFeatureModel featureModel = loadModel(filePath);
+        if (featureModel != null) {
+            FeatureModelFormula formula = new FeatureModelFormula(featureModel);
+            final FeatureModelAnalyzer analyzer = formula.getAnalyzer();
+            List<IFeature> falseOptionalFeatures = analyzer.getFalseOptionalFeatures(null);
+            Set<String> result = new HashSet<>();
+            falseOptionalFeatures.forEach(iFeature -> result.add(iFeature.toString()));
+            return new Result<>(result);
+        }
+        return new Result<>();
+    }
+
+    private IFeatureModel loadModel(String filePath) {
+        LibraryManager.registerLibrary(FMCoreLibrary.getInstance());
+        Path path = Paths.get(filePath);
+        return FeatureModelManager.load(path);
+    }
+
 }

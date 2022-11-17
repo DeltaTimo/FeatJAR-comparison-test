@@ -20,13 +20,13 @@
  */
 package de.featjar.comparison.test;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.FileNotFoundException;
 import java.net.URL;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * An example usage of the FeatureIDE library for feature-model analysis.
@@ -34,23 +34,52 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Thomas Thuem
  */
 public class FeatureModelAnalysisTests {
-	private String getPathFromResource(String resource) throws FileNotFoundException {
-		final URL resourceURL = getClass().getClassLoader().getResource(resource);
-		if (resourceURL == null) {
-			throw new FileNotFoundException(resource);
-		} else {
-			return resourceURL.getPath();
-		}
-	}
+    ITestLibrary library1;
+    ITestLibrary library2;
 
-	@Test
-	public void isTautology() throws FileNotFoundException {
-		String resource = getPathFromResource("FeatureModelAnalysis/car.xml");
+    private String getPathFromResource(String resource) throws FileNotFoundException {
+        final URL resourceURL = getClass().getClassLoader().getResource(resource);
+        if (resourceURL == null) {
+            throw new FileNotFoundException(resource);
+        } else {
+            return resourceURL.getPath();
+        }
+    }
 
-		ITestLibrary library1 = new FeatureIDE();
-		ITestLibrary library2 = new FeatureIDE();
+    @BeforeEach
+    public void setup() {
+        library1 = new FeatureIDE();
+        library2 = new FeatureIDE();
+    }
 
-		assertEquals(Result.get(() -> library1.isTautology(resource)), Result.get(() -> library2.isTautology(resource)));
-	}
+    @Test
+    public void isTautology() throws FileNotFoundException {
+        String resource = getPathFromResource("FeatureModelAnalysis/car.xml");
+        System.out.println(resource);
+        assertEquals(Result.get(() -> library1.isTautology(resource)), Result.get(() -> library2.isTautology(resource)));
+    }
 
+    @Test
+    public void isVoid() throws FileNotFoundException {
+        String resource = getPathFromResource("FeatureModelAnalysis/car.xml");
+        assertEquals(Result.get(() -> library1.isVoid(resource)), Result.get(() -> library2.isVoid(resource)));
+    }
+
+    @Test
+    public void coreFeatures() throws FileNotFoundException {
+        String resource = getPathFromResource("FeatureModelAnalysis/car.xml");
+        assertEquals(Result.get(() -> library1.coreFeatures(resource)), Result.get(() -> library2.coreFeatures(resource)));
+    }
+
+    @Test
+    public void deadFeatures() throws FileNotFoundException {
+        String resource = getPathFromResource("FeatureModelAnalysis/car.xml");
+        assertEquals(Result.get(() -> library1.deadFeatures(resource)), Result.get(() -> library2.deadFeatures(resource)));
+    }
+
+    @Test
+    public void falseOptional() throws FileNotFoundException {
+        String resource = getPathFromResource("FeatureModelAnalysis/car.xml");
+        assertEquals(Result.get(() -> library1.falseOptional(resource)), Result.get(() -> library2.falseOptional(resource)));
+    }
 }
