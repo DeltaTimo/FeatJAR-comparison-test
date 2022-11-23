@@ -1,6 +1,5 @@
 package de.featjar.comparison.test;
 
-import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -10,6 +9,7 @@ import java.util.Set;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.explanations.Explanation;
 import org.prop4j.Implies;
 import org.prop4j.Literal;
 import org.prop4j.Node;
@@ -27,14 +27,14 @@ import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 public class FeatureIDE implements ITestLibrary {
     @Override
-    public Result<Boolean> isTautology(String filePath) {
+    public Result<Boolean> isTautology(String filePath, String[] parameters) {
         final IFeatureModel featureModel = loadModel(filePath);
         if (featureModel != null) {
             FeatureModelFormula formula = new FeatureModelFormula(featureModel);
             final FeatureModelAnalyzer analyzer = formula.getAnalyzer();
             analyzer.analyzeFeatureModel(null);
             final SimpleSatSolver solver = new SimpleSatSolver(formula.getCNF());
-            final Node query = new Implies(new Literal("Navigation"), new Literal("Ports"));
+            final Node query = new Implies(new Literal(parameters[0]), new Literal(parameters[1]));
             System.out.print("Is \"FM => (" + query + ")\" a tautology? ");
             ClauseList queryClauses = Nodes.convert(formula.getCNF().getVariables(), new Not(query), true);
             solver.addClauses(queryClauses);
@@ -112,10 +112,57 @@ public class FeatureIDE implements ITestLibrary {
         return new Result<>();
     }
 
+    @Override
+    public Result<Set<String>> redundantConstraints(String filePath) {
+        final IFeatureModel featureModel = loadModel(filePath);
+        if (featureModel != null) {
+            FeatureModelFormula formula = new FeatureModelFormula(featureModel);
+            final FeatureModelAnalyzer analyzer = formula.getAnalyzer();
+            List<IConstraint> redundantConstraints = analyzer.getRedundantConstraints(null);
+            Set<String> result = new HashSet<>();
+            redundantConstraints.forEach(iFeature -> result.add(iFeature.getDisplayName()));
+            return new Result<>(result);
+        }
+        return new Result<>();
+    }
+
+    @Override
+    public Result<List<Set<String>>> atomicSets(String filePath) {
+        final IFeatureModel featureModel = loadModel(filePath);
+        if (featureModel != null) {
+            FeatureModelFormula formula = new FeatureModelFormula(featureModel);
+            final FeatureModelAnalyzer analyzer = formula.getAnalyzer();
+            List<List<IFeature>> analyzerAtomicSets = analyzer.getAtomicSets(null);
+            List<Set<String>> result = new ArrayList<>();
+            for(int i = 0; i < analyzerAtomicSets.size(); i++) {
+                Set<String> tmp = new HashSet<>();
+                for(int j = 0; j < analyzerAtomicSets.get(i).size(); j++) {
+                    tmp.add(analyzerAtomicSets.get(i).get(j).getName());
+                }
+                result.add(tmp);
+            }
+        }
+        return new Result<>();
+    }
+
+    @Override
+    public Result<Set<String>> indeterminedHiddenFeatures(String filePath) {
+        final IFeatureModel featureModel = loadModel(filePath);
+        if (featureModel != null) {
+            FeatureModelFormula formula = new FeatureModelFormula(featureModel);
+            final FeatureModelAnalyzer analyzer = formula.getAnalyzer();
+            List<IFeature> analyzerIndeterminedHiddenFeatures = analyzer.getIndeterminedHiddenFeatures(null);
+            Set<String> result = new HashSet<>();
+            analyzerIndeterminedHiddenFeatures.forEach(iFeature -> result.add(iFeature.toString()));
+            System.out.println(result); // TODO was genau sind idetermined hidden features
+            return new Result<>(result);
+        }
+        return new Result<>();
+    }
+
     private IFeatureModel loadModel(String filePath) {
         LibraryManager.registerLibrary(FMCoreLibrary.getInstance());
         Path path = Paths.get(filePath);
         return FeatureModelManager.load(path);
     }
-
 }

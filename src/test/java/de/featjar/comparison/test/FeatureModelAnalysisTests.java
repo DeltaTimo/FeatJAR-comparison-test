@@ -20,11 +20,16 @@
  */
 package de.featjar.comparison.test;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.FileNotFoundException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -34,52 +39,102 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Thomas Thuem
  */
 public class FeatureModelAnalysisTests {
-    ITestLibrary library1;
-    ITestLibrary library2;
 
-    private String getPathFromResource(String resource) throws FileNotFoundException {
-        final URL resourceURL = getClass().getClassLoader().getResource(resource);
-        if (resourceURL == null) {
-            throw new FileNotFoundException(resource);
-        } else {
-            return resourceURL.getPath();
-        }
-    }
+	private final List<String> modelNames = Arrays.asList( //
+			"basic",
+			"simple",
+			"car"
+	);
 
-    @BeforeEach
-    public void setup() {
-        library1 = new FeatureIDE();
-        library2 = new FeatureIDE();
-    }
+	ITestLibrary library1;
+	ITestLibrary library2;
 
-    @Test
-    public void isTautology() throws FileNotFoundException {
-        String resource = getPathFromResource("FeatureModelAnalysis/car.xml");
-        System.out.println(resource);
-        assertEquals(Result.get(() -> library1.isTautology(resource)), Result.get(() -> library2.isTautology(resource)));
-    }
+	private String getPathFromResource(String resource) throws FileNotFoundException {
+		final URL resourceURL = getClass().getClassLoader().getResource(resource);
+		if (resourceURL == null) {
+			throw new FileNotFoundException(resource);
+		} else {
+			return resourceURL.getPath().substring(1);
+		}
+	}
 
-    @Test
-    public void isVoid() throws FileNotFoundException {
-        String resource = getPathFromResource("FeatureModelAnalysis/car.xml");
-        assertEquals(Result.get(() -> library1.isVoid(resource)), Result.get(() -> library2.isVoid(resource)));
-    }
+	@BeforeEach
+	public void setup() {
+		library1 = new FeatureIDE();
+		library2 = new FeatureIDE();
+	}
 
-    @Test
-    public void coreFeatures() throws FileNotFoundException {
-        String resource = getPathFromResource("FeatureModelAnalysis/car.xml");
-        assertEquals(Result.get(() -> library1.coreFeatures(resource)), Result.get(() -> library2.coreFeatures(resource)));
-    }
+	@Test
+	public void isTautology() throws FileNotFoundException {
+		String[] basic = {"Root","C"};
+		String[] simple = {"Base","F2"};
+		String[] car = {"Navigation","Ports"};
 
-    @Test
-    public void deadFeatures() throws FileNotFoundException {
-        String resource = getPathFromResource("FeatureModelAnalysis/car.xml");
-        assertEquals(Result.get(() -> library1.deadFeatures(resource)), Result.get(() -> library2.deadFeatures(resource)));
-    }
+		// parameters for Tautologie
+		HashMap<String, String[]> map = new HashMap<>();
+		map.put(modelNames.get(0), basic);
+		map.put(modelNames.get(1), simple);
+		map.put(modelNames.get(2), car);
 
-    @Test
-    public void falseOptional() throws FileNotFoundException {
-        String resource = getPathFromResource("FeatureModelAnalysis/car.xml");
-        assertEquals(Result.get(() -> library1.falseOptional(resource)), Result.get(() -> library2.falseOptional(resource)));
-    }
+		for (Map.Entry<String, String[]> entry : map.entrySet()) {
+			String resource = getPathFromResource("FeatureModelAnalysis/" + entry.getKey() + ".xml");
+			assertEquals(Result.get(() -> library1.isTautology(resource, entry.getValue())), Result.get(() -> library2.isTautology(resource, entry.getValue())));
+		}
+	}
+
+	@Test
+	public void isVoid() throws FileNotFoundException {
+		for (final String modelName : modelNames) {
+			String resource = getPathFromResource("FeatureModelAnalysis/" + modelName + ".xml");
+			assertEquals(Result.get(() -> library1.isVoid(resource)), Result.get(() -> library2.isVoid(resource)));
+		}
+	}
+
+	@Test
+	public void coreFeatures() throws FileNotFoundException {
+		for (final String modelName : modelNames) {
+			String resource = getPathFromResource("FeatureModelAnalysis/" + modelName + ".xml");
+			assertEquals(Result.get(() -> library1.coreFeatures(resource)), Result.get(() -> library2.coreFeatures(resource)));
+		}
+	}
+
+	@Test
+	public void deadFeatures() throws FileNotFoundException {
+		for (final String modelName : modelNames) {
+			String resource = getPathFromResource("FeatureModelAnalysis/" + modelName + ".xml");
+			assertEquals(Result.get(() -> library1.deadFeatures(resource)), Result.get(() -> library2.deadFeatures(resource)));
+		}
+	}
+
+	@Test
+	public void falseOptional() throws FileNotFoundException {
+		for (final String modelName : modelNames) {
+			String resource = getPathFromResource("FeatureModelAnalysis/" + modelName + ".xml");
+			assertEquals(Result.get(() -> library1.falseOptional(resource)), Result.get(() -> library2.falseOptional(resource)));
+		}
+	}
+
+	@Test
+	public void redundantConstraints() throws FileNotFoundException {
+		for (final String modelName : modelNames) {
+			String resource = getPathFromResource("FeatureModelAnalysis/" + modelName + ".xml");
+			assertEquals(Result.get(() -> library1.redundantConstraints(resource)), Result.get(() -> library2.redundantConstraints(resource)));
+		}
+	}
+
+	@Test
+	public void atomicSet() throws FileNotFoundException {
+		for (final String modelName : modelNames) {
+			String resource = getPathFromResource("FeatureModelAnalysis/" + modelName + ".xml");
+			assertEquals(Result.get(() -> library1.atomicSets(resource)), Result.get(() -> library2.atomicSets(resource)));
+		}
+	}
+
+	@Test
+	public void indeterminedHiddenFeatures() throws FileNotFoundException {
+		for (final String modelName : modelNames) {
+			String resource = getPathFromResource("FeatureModelAnalysis/" + modelName + ".xml");
+			assertEquals(Result.get(() -> library1.indeterminedHiddenFeatures(resource)), Result.get(() -> library2.indeterminedHiddenFeatures(resource)));
+		}
+	}
 }

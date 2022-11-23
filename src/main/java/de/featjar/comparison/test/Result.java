@@ -31,6 +31,7 @@ public class Result<T> {
                     return true;
                 }
                 if (other.result != null) {
+                    // TODO compare Sets without taking into account the order
                     return other.result.equals(result);
                 }
                 // other.result == null && result != null
