@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
+import de.ovgu.featureide.fm.core.analysis.cnf.analysis.CountSolutionsAnalysis;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import org.prop4j.Implies;
@@ -143,5 +145,18 @@ public class FeatureIDE implements ITestLibrary {
             return new Result<>(result);
         }
         return new Result<>();
+    }
+
+    @Override
+    public Result<Long> countSolutions(IFeatureModel featureModel) {
+        FeatureModelFormula formula = new FeatureModelFormula(featureModel);
+        CNF cnf = formula.getCNF();
+        CountSolutionsAnalysis countSolutionsAnalysis = new CountSolutionsAnalysis(cnf);
+        try {
+            System.out.println(countSolutionsAnalysis.analyze(null));
+            return new Result<>(countSolutionsAnalysis.analyze(null));
+        } catch (Exception e) {
+            return new Result<>();
+        }
     }
 }

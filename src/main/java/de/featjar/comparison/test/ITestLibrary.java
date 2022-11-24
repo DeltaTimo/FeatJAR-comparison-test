@@ -14,4 +14,5 @@ public interface ITestLibrary {
     Result<Set<String>> redundantConstraints(IFeatureModel featureModel);
     Result<List<Set<String>>> atomicSets(IFeatureModel featureModel);
     Result<Set<String>> indeterminedHiddenFeatures(IFeatureModel featureModel);
+    Result<Long> countSolutions(IFeatureModel featureModel);
 }
