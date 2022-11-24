@@ -1,17 +1,17 @@
 package de.featjar.comparison.test;
 
-import org.stringtemplate.v4.ST;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 import java.util.List;
 import java.util.Set;
 
 public interface ITestLibrary {
-    Result<Boolean> isTautology(String filePath, String[] parameters);
-    Result<Boolean> isVoid(String filePath);
-    Result<Set<String>> coreFeatures(String filePath);
-    Result<Set<String>> deadFeatures(String filePath);
-    Result<Set<String>> falseOptional(String filePath);
-    Result<Set<String>> redundantConstraints(String filePath);
-    Result<List<Set<String>>> atomicSets(String filePath);
-    Result<Set<String>> indeterminedHiddenFeatures(String filePath);
+    Result<Boolean> isTautology(IFeatureModel featureModel, String[] parameters);
+    Result<Boolean> isVoid(IFeatureModel featureModel);
+    Result<Set<String>> coreFeatures(IFeatureModel featureModel);
+    Result<Set<String>> deadFeatures(IFeatureModel featureModel);
+    Result<Set<String>> falseOptional(IFeatureModel featureModel);
+    Result<Set<String>> redundantConstraints(IFeatureModel featureModel);
+    Result<List<Set<String>>> atomicSets(IFeatureModel featureModel);
+    Result<Set<String>> indeterminedHiddenFeatures(IFeatureModel featureModel);
 }

@@ -1,7 +1,5 @@
 package de.featjar.comparison.test;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -9,7 +7,6 @@ import java.util.Set;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.explanations.Explanation;
 import org.prop4j.Implies;
 import org.prop4j.Literal;
 import org.prop4j.Node;
@@ -21,14 +18,10 @@ import de.ovgu.featureide.fm.core.analysis.cnf.Nodes;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.SimpleSatSolver;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.init.FMCoreLibrary;
-import de.ovgu.featureide.fm.core.init.LibraryManager;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 public class FeatureIDE implements ITestLibrary {
     @Override
-    public Result<Boolean> isTautology(String filePath, String[] parameters) {
-        final IFeatureModel featureModel = loadModel(filePath);
+    public Result<Boolean> isTautology(IFeatureModel featureModel, String[] parameters) {
         if (featureModel != null) {
             FeatureModelFormula formula = new FeatureModelFormula(featureModel);
             final FeatureModelAnalyzer analyzer = formula.getAnalyzer();
@@ -58,8 +51,7 @@ public class FeatureIDE implements ITestLibrary {
     }
 
     @Override
-    public Result<Boolean> isVoid(String filePath) {
-        final IFeatureModel featureModel = loadModel(filePath);
+    public Result<Boolean> isVoid(IFeatureModel featureModel) {
         if (featureModel != null) {
             FeatureModelFormula formula = new FeatureModelFormula(featureModel);
             final FeatureModelAnalyzer analyzer = formula.getAnalyzer();
@@ -71,8 +63,7 @@ public class FeatureIDE implements ITestLibrary {
     }
 
     @Override
-    public Result<Set<String>> coreFeatures(String filePath) {
-        final IFeatureModel featureModel = loadModel(filePath);
+    public Result<Set<String>> coreFeatures(IFeatureModel featureModel) {
         if (featureModel != null) {
             FeatureModelFormula formula = new FeatureModelFormula(featureModel);
             final FeatureModelAnalyzer analyzer = formula.getAnalyzer();
@@ -85,8 +76,7 @@ public class FeatureIDE implements ITestLibrary {
     }
 
     @Override
-    public Result<Set<String>> deadFeatures(String filePath) {
-        final IFeatureModel featureModel = loadModel(filePath);
+    public Result<Set<String>> deadFeatures(IFeatureModel featureModel) {
         if (featureModel != null) {
             FeatureModelFormula formula = new FeatureModelFormula(featureModel);
             final FeatureModelAnalyzer analyzer = formula.getAnalyzer();
@@ -99,8 +89,7 @@ public class FeatureIDE implements ITestLibrary {
     }
 
     @Override
-    public Result<Set<String>> falseOptional(String filePath) {
-        final IFeatureModel featureModel = loadModel(filePath);
+    public Result<Set<String>> falseOptional(IFeatureModel featureModel) {
         if (featureModel != null) {
             FeatureModelFormula formula = new FeatureModelFormula(featureModel);
             final FeatureModelAnalyzer analyzer = formula.getAnalyzer();
@@ -113,8 +102,7 @@ public class FeatureIDE implements ITestLibrary {
     }
 
     @Override
-    public Result<Set<String>> redundantConstraints(String filePath) {
-        final IFeatureModel featureModel = loadModel(filePath);
+    public Result<Set<String>> redundantConstraints(IFeatureModel featureModel) {
         if (featureModel != null) {
             FeatureModelFormula formula = new FeatureModelFormula(featureModel);
             final FeatureModelAnalyzer analyzer = formula.getAnalyzer();
@@ -127,8 +115,7 @@ public class FeatureIDE implements ITestLibrary {
     }
 
     @Override
-    public Result<List<Set<String>>> atomicSets(String filePath) {
-        final IFeatureModel featureModel = loadModel(filePath);
+    public Result<List<Set<String>>> atomicSets(IFeatureModel featureModel) {
         if (featureModel != null) {
             FeatureModelFormula formula = new FeatureModelFormula(featureModel);
             final FeatureModelAnalyzer analyzer = formula.getAnalyzer();
@@ -146,23 +133,15 @@ public class FeatureIDE implements ITestLibrary {
     }
 
     @Override
-    public Result<Set<String>> indeterminedHiddenFeatures(String filePath) {
-        final IFeatureModel featureModel = loadModel(filePath);
+    public Result<Set<String>> indeterminedHiddenFeatures(IFeatureModel featureModel) {
         if (featureModel != null) {
             FeatureModelFormula formula = new FeatureModelFormula(featureModel);
             final FeatureModelAnalyzer analyzer = formula.getAnalyzer();
             List<IFeature> analyzerIndeterminedHiddenFeatures = analyzer.getIndeterminedHiddenFeatures(null);
             Set<String> result = new HashSet<>();
             analyzerIndeterminedHiddenFeatures.forEach(iFeature -> result.add(iFeature.toString()));
-            System.out.println(result); // TODO was genau sind idetermined hidden features
             return new Result<>(result);
         }
         return new Result<>();
-    }
-
-    private IFeatureModel loadModel(String filePath) {
-        LibraryManager.registerLibrary(FMCoreLibrary.getInstance());
-        Path path = Paths.get(filePath);
-        return FeatureModelManager.load(path);
     }
 }

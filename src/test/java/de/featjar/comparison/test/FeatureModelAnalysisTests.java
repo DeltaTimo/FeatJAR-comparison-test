@@ -20,37 +20,40 @@
  */
 package de.featjar.comparison.test;
 
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.init.FMCoreLibrary;
+import de.ovgu.featureide.fm.core.init.LibraryManager;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.FileNotFoundException;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * An example usage of the FeatureIDE library for feature-model analysis.
  *
- * @author Thomas Thuem
+ * @author
  */
 public class FeatureModelAnalysisTests {
 
-	private final List<String> modelNames = Arrays.asList( //
-			"basic",
-			"simple",
-			"car"
+	private static final List<String> modelNames = Arrays.asList( //
+			"FeatureModelAnalysis/basic.xml",
+			"FeatureModelAnalysis/simple.xml",
+			"FeatureModelAnalysis/car.xml",
+			"FeatureModelAnalysis/hidden.xml"
 	);
+	private static final List<IFeatureModel> featureModels = new ArrayList<>();
+	private static FeatureIDE library1;
+	private static FeatureIDE library2;
 
-	ITestLibrary library1;
-	ITestLibrary library2;
-
-	private String getPathFromResource(String resource) throws FileNotFoundException {
-		final URL resourceURL = getClass().getClassLoader().getResource(resource);
+	private static String getPathFromResource(String resource) throws FileNotFoundException {
+		final URL resourceURL = FeatureModelAnalysisTests.class.getClassLoader().getResource(resource);
 		if (resourceURL == null) {
 			throw new FileNotFoundException(resource);
 		} else {
@@ -58,83 +61,75 @@ public class FeatureModelAnalysisTests {
 		}
 	}
 
-	@BeforeEach
-	public void setup() {
+	@BeforeAll
+	public static void setup() {
 		library1 = new FeatureIDE();
 		library2 = new FeatureIDE();
+		modelNames.forEach(module -> {
+			try {
+				featureModels.add(loadModel(getPathFromResource(module)));
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+		});
+	}
+
+	private static IFeatureModel loadModel(String filePath) {
+		LibraryManager.registerLibrary(FMCoreLibrary.getInstance());
+		Path path = Paths.get(filePath);
+		return FeatureModelManager.load(path);
 	}
 
 	@Test
-	public void isTautology() throws FileNotFoundException {
+	public void isTautology() {
 		String[] basic = {"Root","C"};
 		String[] simple = {"Base","F2"};
 		String[] car = {"Navigation","Ports"};
+		String[] hidden = {"MainGpl","UndirectedWithNeighbors"};
 
-		// parameters for Tautologie
-		HashMap<String, String[]> map = new HashMap<>();
-		map.put(modelNames.get(0), basic);
-		map.put(modelNames.get(1), simple);
-		map.put(modelNames.get(2), car);
-
-		for (Map.Entry<String, String[]> entry : map.entrySet()) {
-			String resource = getPathFromResource("FeatureModelAnalysis/" + entry.getKey() + ".xml");
-			assertEquals(Result.get(() -> library1.isTautology(resource, entry.getValue())), Result.get(() -> library2.isTautology(resource, entry.getValue())));
-		}
+		// parameters for tautology
+		HashMap<IFeatureModel, String[]> map = new HashMap<>();
+		map.put(featureModels.get(0), basic);
+		map.put(featureModels.get(1), simple);
+		map.put(featureModels.get(2), car);
+		map.put(featureModels.get(3), hidden);
+		map.entrySet()
+				.stream()
+				.forEach(entry -> assertEquals(Result.get(() -> library1.isTautology(entry.getKey(), entry.getValue())), Result.get(() -> library2.isTautology(entry.getKey(), entry.getValue()))));
 	}
 
 	@Test
-	public void isVoid() throws FileNotFoundException {
-		for (final String modelName : modelNames) {
-			String resource = getPathFromResource("FeatureModelAnalysis/" + modelName + ".xml");
-			assertEquals(Result.get(() -> library1.isVoid(resource)), Result.get(() -> library2.isVoid(resource)));
-		}
+	public void isVoid() {
+		featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.isVoid(featureModel)), Result.get(() -> library2.isVoid(featureModel))));
 	}
 
 	@Test
-	public void coreFeatures() throws FileNotFoundException {
-		for (final String modelName : modelNames) {
-			String resource = getPathFromResource("FeatureModelAnalysis/" + modelName + ".xml");
-			assertEquals(Result.get(() -> library1.coreFeatures(resource)), Result.get(() -> library2.coreFeatures(resource)));
-		}
+	public void coreFeatures() {
+		featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.coreFeatures(featureModel)), Result.get(() -> library2.coreFeatures(featureModel))));
 	}
 
 	@Test
-	public void deadFeatures() throws FileNotFoundException {
-		for (final String modelName : modelNames) {
-			String resource = getPathFromResource("FeatureModelAnalysis/" + modelName + ".xml");
-			assertEquals(Result.get(() -> library1.deadFeatures(resource)), Result.get(() -> library2.deadFeatures(resource)));
-		}
+	public void deadFeatures() {
+		featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.deadFeatures(featureModel)), Result.get(() -> library2.deadFeatures(featureModel))));
 	}
 
 	@Test
-	public void falseOptional() throws FileNotFoundException {
-		for (final String modelName : modelNames) {
-			String resource = getPathFromResource("FeatureModelAnalysis/" + modelName + ".xml");
-			assertEquals(Result.get(() -> library1.falseOptional(resource)), Result.get(() -> library2.falseOptional(resource)));
-		}
+	public void falseOptional() {
+		featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.falseOptional(featureModel)), Result.get(() -> library2.falseOptional(featureModel))));
 	}
 
 	@Test
-	public void redundantConstraints() throws FileNotFoundException {
-		for (final String modelName : modelNames) {
-			String resource = getPathFromResource("FeatureModelAnalysis/" + modelName + ".xml");
-			assertEquals(Result.get(() -> library1.redundantConstraints(resource)), Result.get(() -> library2.redundantConstraints(resource)));
-		}
+	public void redundantConstraints() {
+		featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.redundantConstraints(featureModel)), Result.get(() -> library2.redundantConstraints(featureModel))));
 	}
 
 	@Test
-	public void atomicSet() throws FileNotFoundException {
-		for (final String modelName : modelNames) {
-			String resource = getPathFromResource("FeatureModelAnalysis/" + modelName + ".xml");
-			assertEquals(Result.get(() -> library1.atomicSets(resource)), Result.get(() -> library2.atomicSets(resource)));
-		}
+	public void atomicSet() {
+		featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.atomicSets(featureModel)), Result.get(() -> library2.atomicSets(featureModel))));
 	}
 
 	@Test
-	public void indeterminedHiddenFeatures() throws FileNotFoundException {
-		for (final String modelName : modelNames) {
-			String resource = getPathFromResource("FeatureModelAnalysis/" + modelName + ".xml");
-			assertEquals(Result.get(() -> library1.indeterminedHiddenFeatures(resource)), Result.get(() -> library2.indeterminedHiddenFeatures(resource)));
-		}
+	public void indeterminedHiddenFeatures() {
+		featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.indeterminedHiddenFeatures(featureModel)), Result.get(() -> library2.indeterminedHiddenFeatures(featureModel))));
 	}
 }

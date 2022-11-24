@@ -16,7 +16,7 @@ import de.ovgu.featureide.fm.core.io.sxfm.SXFMFormat;
 import de.ovgu.featureide.fm.core.io.velvet.SimpleVelvetFeatureModelFormat;
 
 /**
- * example transformation from featuremodel in diffrent formats
+ * example transformation from featuremodel in different formats
  *
  * @author Katjana Herbst
  */
@@ -29,34 +29,30 @@ public class FeatureIDETransformation implements ITestLibraryTransformation{
         FeatureModelManager.save(model, Paths.get(savePath), format);
     }
 
-    public Result<String> getDimacs(String path) {
-        IFeatureModel model = FeatureModelManager.load(Paths.get(path));
+    public Result<String> getDimacs(IFeatureModel model) {
         FeatureModelFormula formula = new FeatureModelFormula(model);
         DimacsWriter dimacsWriter = new DimacsWriter(formula.getCNF());
         return new Result<>(dimacsWriter.write());
     }
 
-    public Result<String> getCNF(String path) {
-        IFeatureModel model = FeatureModelManager.load(Paths.get(path));
+    public Result<String> getCNF(IFeatureModel model) {
         FeatureModelFormula formula = new FeatureModelFormula(model);
         CNF cnf = formula.getCNF();
         return new Result<>(cnf.toString());
     }
 
-    public Result<String> getUVL(String path) {
-        IFeatureModel model = FeatureModelManager.load(Paths.get(path));
+    public Result<String> getUVL(IFeatureModel model) {
         final IFeatureModelFormat format = new UVLFeatureModelFormat();
         return new Result<>(format.getInstance().write(model));
     }
 
-    public Result<String> getVelvet(String path) {
-        IFeatureModel model = FeatureModelManager.load(Paths.get(path));
+    public Result<String> getVelvet(IFeatureModel model) {
         final IFeatureModelFormat format = new SimpleVelvetFeatureModelFormat();
         return new Result<>(format.getInstance().write(model));
     }
 
-    public Result<String> getSxfml(String path) {
-        IFeatureModel model = FeatureModelManager.load(Paths.get(path));
+    @Override
+    public Result<String> getSxfml(IFeatureModel model) {
         final IFeatureModelFormat format = new SXFMFormat();
         return new Result<>(format.getInstance().write(model));
     }

@@ -1,13 +1,14 @@
 package de.featjar.comparison.test;
 
 
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 public interface ITestLibraryTransformation {
 
-    Result<String> getDimacs(String path);
-    Result<String> getCNF(String path);
-    Result<String> getUVL(String path);
-    Result<String> getVelvet(String path);
-    Result<String> getSxfml(String path);
+    Result<String> getDimacs(IFeatureModel featureModel);
+    Result<String> getCNF(IFeatureModel featureModel);
+    Result<String> getUVL(IFeatureModel featureModel);
+    Result<String> getVelvet(IFeatureModel featureModel);
+    Result<String> getSxfml(IFeatureModel featureModel);
 
 }

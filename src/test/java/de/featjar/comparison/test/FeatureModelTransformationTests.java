@@ -1,20 +1,54 @@
 package de.featjar.comparison.test;
 
-import org.junit.jupiter.api.BeforeEach;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.init.FMCoreLibrary;
+import de.ovgu.featureide.fm.core.init.LibraryManager;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.FileNotFoundException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FeatureModelTransformationTests {
 
-    ITestLibraryTransformation library1;
-    ITestLibraryTransformation library2;
+    private static final List<String> modelNames = Arrays.asList( //
+            "FeatureModelTransformation/model.xml"
+    );
 
-    private String getPathFromResource(String resource) throws FileNotFoundException {
-        final URL resourceURL = getClass().getClassLoader().getResource(resource);
+    private static FeatureIDETransformation library1;
+    private static FeatureIDETransformation library2;
+    private static final List<IFeatureModel> featureModels = new ArrayList<>();
+
+
+    @BeforeAll
+    public static void setup() {
+        library1 = new FeatureIDETransformation();
+        library2 = new FeatureIDETransformation();
+        modelNames.forEach(module -> {
+            try {
+                featureModels.add(loadModel(getPathFromResource(module)));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    private static IFeatureModel loadModel(String filePath) {
+        LibraryManager.registerLibrary(FMCoreLibrary.getInstance());
+        Path path = Paths.get(filePath);
+        return FeatureModelManager.load(path);
+    }
+
+    private static String getPathFromResource(String resource) throws FileNotFoundException {
+        final URL resourceURL = FeatureModelTransformationTests.class.getClassLoader().getResource(resource);
         if (resourceURL == null) {
             throw new FileNotFoundException(resource);
         } else {
@@ -22,39 +56,30 @@ public class FeatureModelTransformationTests {
         }
     }
 
-    @BeforeEach
-    public void setup() {
-        library1 = new FeatureIDETransformation();
-        library2 = new FeatureIDETransformation();
+    @Test
+    public void testDimacs() {
+        featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.getDimacs(featureModel)), Result.get(() -> library2.getDimacs(featureModel))));
     }
 
     @Test
-    public void testDimacs() throws FileNotFoundException {
-        String resource = getPathFromResource("FeatureModelTransformation/model.xml");
-        assertEquals(Result.get(() -> library1.getDimacs(resource)), Result.get(() -> library2.getDimacs(resource)));
+    public void testCNF() {
+        featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.getCNF(featureModel)), Result.get(() -> library2.getCNF(featureModel))));
     }
 
     @Test
-    public void testCNF() throws FileNotFoundException {
-        String resource = getPathFromResource("FeatureModelTransformation/model.xml");
-        assertEquals(Result.get(() -> library1.getCNF(resource)), Result.get(() -> library2.getCNF(resource)));
+    public void testUVL() {
+        featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.getUVL(featureModel)), Result.get(() -> library2.getUVL(featureModel))));
+
     }
 
     @Test
-    public void testUVL() throws FileNotFoundException {
-        String resource = getPathFromResource("FeatureModelTransformation/model.xml");
-        assertEquals(Result.get(() -> library1.getUVL(resource)), Result.get(() -> library2.getUVL(resource)));
+    public void tetSXFML() {
+        featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.getSxfml(featureModel)), Result.get(() -> library2.getSxfml(featureModel))));
     }
 
     @Test
-    public void tetSXFML() throws FileNotFoundException {
-        String resource = getPathFromResource("FeatureModelTransformation/model.xml");
-        assertEquals(Result.get(() -> library1.getSxfml(resource)), Result.get(() -> library2.getSxfml(resource)));
-    }
+    public void testVelvet() {
+        featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.getVelvet(featureModel)), Result.get(() -> library2.getVelvet(featureModel))));
 
-    @Test
-    public void testVelvet() throws FileNotFoundException {
-        String resource = getPathFromResource("FeatureModelTransformation/model.xml");
-        assertEquals(Result.get(() -> library1.getVelvet(resource)), Result.get(() -> library2.getVelvet(resource)));
     }
 }
