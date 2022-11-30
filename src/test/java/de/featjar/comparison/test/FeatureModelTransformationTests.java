@@ -23,15 +23,15 @@ public class FeatureModelTransformationTests {
             "FeatureModelTransformation/model.xml"
     );
 
-    private static FeatureIDETransformation library1;
-    private static FeatureIDETransformation library2;
+    private static FeatureIDELibrary library1;
+    private static FeatureIDELibrary library2;
     private static final List<IFeatureModel> featureModels = new ArrayList<>();
 
 
     @BeforeAll
     public static void setup() {
-        library1 = new FeatureIDETransformation();
-        library2 = new FeatureIDETransformation();
+        library1 = new FeatureIDELibrary();
+        library2 = new FeatureIDELibrary();
         modelNames.forEach(module -> {
             try {
                 featureModels.add(loadModel(getPathFromResource(module)));
@@ -69,7 +69,6 @@ public class FeatureModelTransformationTests {
     @Test
     public void testUVL() {
         featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.getUVL(featureModel)), Result.get(() -> library2.getUVL(featureModel))));
-
     }
 
     @Test
@@ -80,6 +79,5 @@ public class FeatureModelTransformationTests {
     @Test
     public void testVelvet() {
         featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.getVelvet(featureModel)), Result.get(() -> library2.getVelvet(featureModel))));
-
     }
 }

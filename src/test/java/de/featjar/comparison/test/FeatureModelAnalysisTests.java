@@ -49,8 +49,8 @@ public class FeatureModelAnalysisTests {
 			"FeatureModelAnalysis/hidden.xml"
 	);
 	private static final List<IFeatureModel> featureModels = new ArrayList<>();
-	private static FeatureIDE library1;
-	private static FeatureIDE library2;
+	private static FeatureIDEAnalyse library1;
+	private static FeatureIDEAnalyse library2;
 
 	private static String getPathFromResource(String resource) throws FileNotFoundException {
 		final URL resourceURL = FeatureModelAnalysisTests.class.getClassLoader().getResource(resource);
@@ -63,8 +63,8 @@ public class FeatureModelAnalysisTests {
 
 	@BeforeAll
 	public static void setup() {
-		library1 = new FeatureIDE();
-		library2 = new FeatureIDE();
+		library1 = new FeatureIDEAnalyse();
+		library2 = new FeatureIDEAnalyse();
 		modelNames.forEach(module -> {
 			try {
 				featureModels.add(loadModel(getPathFromResource(module)));
@@ -81,7 +81,7 @@ public class FeatureModelAnalysisTests {
 	}
 
 	@Test
-	public void isTautology() {
+	public void testIsTautology() {
 		String[] basic = {"Root","C"};
 		String[] simple = {"Base","F2"};
 		String[] car = {"Navigation","Ports"};
@@ -99,37 +99,42 @@ public class FeatureModelAnalysisTests {
 	}
 
 	@Test
-	public void isVoid() {
+	public void testIsVoid() {
 		featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.isVoid(featureModel)), Result.get(() -> library2.isVoid(featureModel))));
 	}
 
 	@Test
-	public void coreFeatures() {
+	public void testCoreFeatures() {
 		featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.coreFeatures(featureModel)), Result.get(() -> library2.coreFeatures(featureModel))));
 	}
 
 	@Test
-	public void deadFeatures() {
+	public void testDeadFeatures() {
 		featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.deadFeatures(featureModel)), Result.get(() -> library2.deadFeatures(featureModel))));
 	}
 
 	@Test
-	public void falseOptional() {
+	public void testFalseOptional() {
 		featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.falseOptional(featureModel)), Result.get(() -> library2.falseOptional(featureModel))));
 	}
 
 	@Test
-	public void redundantConstraints() {
+	public void testRedundantConstraints() {
 		featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.redundantConstraints(featureModel)), Result.get(() -> library2.redundantConstraints(featureModel))));
 	}
 
 	@Test
-	public void atomicSet() {
+	public void testAtomicSet() {
 		featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.atomicSets(featureModel)), Result.get(() -> library2.atomicSets(featureModel))));
 	}
 
 	@Test
-	public void indeterminedHiddenFeatures() {
+	public void testIndeterminedHiddenFeatures() {
 		featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.indeterminedHiddenFeatures(featureModel)), Result.get(() -> library2.indeterminedHiddenFeatures(featureModel))));
+	}
+
+	@Test
+	public void testCountSolutions() {
+		featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.countSolutions(featureModel)), Result.get(() -> library2.countSolutions(featureModel))));
 	}
 }

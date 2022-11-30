@@ -20,7 +20,7 @@ import de.ovgu.featureide.fm.core.io.velvet.SimpleVelvetFeatureModelFormat;
  *
  * @author Katjana Herbst
  */
-public class FeatureIDETransformation implements ITestLibraryTransformation{
+public class FeatureIDETransformation implements ITransformations {
     static {
         LibraryManager.registerLibrary(FMCoreLibrary.getInstance());
     }

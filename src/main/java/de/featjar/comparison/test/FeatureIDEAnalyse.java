@@ -21,7 +21,7 @@ import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.SimpleSatSolver;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
-public class FeatureIDE implements ITestLibrary {
+public class FeatureIDEAnalyse implements IAnalyses {
     @Override
     public Result<Boolean> isTautology(IFeatureModel featureModel, String[] parameters) {
         if (featureModel != null) {
@@ -153,7 +153,6 @@ public class FeatureIDE implements ITestLibrary {
         CNF cnf = formula.getCNF();
         CountSolutionsAnalysis countSolutionsAnalysis = new CountSolutionsAnalysis(cnf);
         try {
-            System.out.println(countSolutionsAnalysis.analyze(null));
             return new Result<>(countSolutionsAnalysis.analyze(null));
         } catch (Exception e) {
             return new Result<>();

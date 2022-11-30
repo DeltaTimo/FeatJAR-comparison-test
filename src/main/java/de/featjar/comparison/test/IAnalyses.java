@@ -5,7 +5,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import java.util.List;
 import java.util.Set;
 
-public interface ITestLibrary {
+public interface IAnalyses {
     Result<Boolean> isTautology(IFeatureModel featureModel, String[] parameters);
     Result<Boolean> isVoid(IFeatureModel featureModel);
     Result<Set<String>> coreFeatures(IFeatureModel featureModel);
