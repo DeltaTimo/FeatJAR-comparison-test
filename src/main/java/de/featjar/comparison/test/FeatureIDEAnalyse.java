@@ -23,13 +23,12 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 public class FeatureIDEAnalyse implements IAnalyses {
     @Override
-    public Result<Boolean> isTautology(IFeatureModel featureModel, String[] parameters) {
+    public Result<Boolean> isTautology(IFeatureModel featureModel, Node query) {
         if (featureModel != null) {
             FeatureModelFormula formula = new FeatureModelFormula(featureModel);
             final FeatureModelAnalyzer analyzer = formula.getAnalyzer();
             analyzer.analyzeFeatureModel(null);
             final SimpleSatSolver solver = new SimpleSatSolver(formula.getCNF());
-            final Node query = new Implies(new Literal(parameters[0]), new Literal(parameters[1]));
             System.out.print("Is \"FM => (" + query + ")\" a tautology? ");
             ClauseList queryClauses = Nodes.convert(formula.getCNF().getVariables(), new Not(query), true);
             solver.addClauses(queryClauses);

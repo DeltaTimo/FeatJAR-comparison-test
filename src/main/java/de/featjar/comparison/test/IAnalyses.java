@@ -1,12 +1,13 @@
 package de.featjar.comparison.test;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import org.prop4j.Node;
 
 import java.util.List;
 import java.util.Set;
 
 public interface IAnalyses {
-    Result<Boolean> isTautology(IFeatureModel featureModel, String[] parameters);
+    Result<Boolean> isTautology(IFeatureModel featureModel, Node query);
     Result<Boolean> isVoid(IFeatureModel featureModel);
     Result<Set<String>> coreFeatures(IFeatureModel featureModel);
     Result<Set<String>> deadFeatures(IFeatureModel featureModel);

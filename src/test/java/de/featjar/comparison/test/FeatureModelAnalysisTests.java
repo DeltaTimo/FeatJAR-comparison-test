@@ -26,6 +26,7 @@ import de.ovgu.featureide.fm.core.init.LibraryManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.prop4j.*;
 
 import java.io.FileNotFoundException;
 import java.net.URL;
@@ -82,17 +83,18 @@ public class FeatureModelAnalysisTests {
 
 	@Test
 	public void testIsTautology() {
-		String[] basic = {"Root","C"};
-		String[] simple = {"Base","F2"};
-		String[] car = {"Navigation","Ports"};
-		String[] hidden = {"MainGpl","UndirectedWithNeighbors"};
+		// queries for tautology
+		Node basic = new Implies(new Literal("Root"), new Literal("C"));
+		Node simple = new Implies(new Literal("Base"), new Literal("F2"));
+		Node car = new Implies(new Literal("Navigation"), new Literal("Ports"));
+		Node hidden =  new And(new Literal("MainGpl"), new Not(new Literal("UndirectedWithNeighbors")));
 
-		// parameters for tautology
-		HashMap<IFeatureModel, String[]> map = new HashMap<>();
+		HashMap<IFeatureModel, Node> map = new HashMap<>();
 		map.put(featureModels.get(0), basic);
 		map.put(featureModels.get(1), simple);
 		map.put(featureModels.get(2), car);
 		map.put(featureModels.get(3), hidden);
+
 		map.entrySet()
 				.stream()
 				.forEach(entry -> assertEquals(Result.get(() -> library1.isTautology(entry.getKey(), entry.getValue())), Result.get(() -> library2.isTautology(entry.getKey(), entry.getValue()))));
