@@ -1,19 +1,17 @@
 package de.featjar.comparison.test;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.init.FMCoreLibrary;
-import de.ovgu.featureide.fm.core.init.LibraryManager;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.featjar.comparison.test.helper.featureide.FeatureIDEBase;
+import de.featjar.comparison.test.helper.featureide.FeatureIDEModification;
+import de.featjar.comparison.test.helper.Result;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -21,7 +19,8 @@ public class FeatureModelModificationTest {
     private static final List<String> modelNames = Arrays.asList( //
             "FeatureModelModification/basic.xml"
     );
-    private static final List<IFeatureModel> featureModels = new ArrayList<>();
+    private static final Map<String,String> featureModels = new HashMap<>();
+    private static FeatureIDEBase baseOperations;
     private static FeatureIDEModification library1;
     private static FeatureIDEModification library2;
 
@@ -36,54 +35,86 @@ public class FeatureModelModificationTest {
 
     @BeforeAll
     public static void setup() {
+        baseOperations = new FeatureIDEBase();
         library1 = new FeatureIDEModification();
         library2 = new FeatureIDEModification();
         modelNames.forEach(module -> {
             try {
-                featureModels.add(loadModel(getPathFromResource(module)));
+                featureModels.put(getXMLAsString(getPathFromResource(module)), module);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
+                throw new RuntimeException();
             }
         });
     }
 
-    private static IFeatureModel loadModel(String filePath) {
-        LibraryManager.registerLibrary(FMCoreLibrary.getInstance());
-        Path path = Paths.get(filePath);
-        return FeatureModelManager.load(path);
-    }
     @Test
     public void testAddFeature() {
-        featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.addFeature(featureModel.clone())), Result.get(() -> library2.addFeature(featureModel.clone()))));
+        featureModels.entrySet()
+                .stream()
+                .forEach(featureModel -> assertEquals(Result.get(() -> library1.addFeature(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue()))), Result.get(() -> library2.addFeature(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue())))));
     }
 
     @Test
     public void testRemoveFeature() {
-        featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.removeFeature(featureModel.clone())), Result.get(() -> library2.removeFeature(featureModel.clone()))));
+        featureModels.entrySet()
+                .stream()
+                .forEach(featureModel -> assertEquals(Result.get(() -> library1.removeFeature(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue()))), Result.get(() -> library2.removeFeature(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue())))));
     }
 
     @Test
     public void testRemoveConstraint() {
-        featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.removeConstraint(featureModel.clone())), Result.get(() -> library2.removeConstraint(featureModel.clone()))));
+        featureModels.entrySet()
+                .stream()
+                .forEach(featureModel -> assertEquals(Result.get(() -> library1.removeConstraint(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue()))), Result.get(() -> library2.removeConstraint(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue())))));
     }
 
     @Test
     public void testAddConstraint() {
-        featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.addConstraint(featureModel.clone())), Result.get(() -> library2.addConstraint(featureModel.clone()))));
+        featureModels.entrySet()
+                .stream()
+                .forEach(featureModel -> assertEquals(Result.get(() -> library1.addConstraint(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue()))), Result.get(() -> library2.addConstraint(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue())))));
     }
 
     @Test
     public void testSlice() {
-        featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.slice(featureModel.clone())), Result.get(() -> library2.slice(featureModel.clone()))));
+        featureModels.entrySet()
+                .stream()
+                .forEach(featureModel -> assertEquals(Result.get(() -> library1.slice(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue()))), Result.get(() -> library2.slice(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue())))));
     }
 
     @Test
     public void testGeneralization() {
-        featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.comparatorGeneralization(featureModel.clone())), Result.get(() -> library2.comparatorGeneralization(featureModel.clone()))));
+        featureModels.entrySet()
+                .stream()
+                .forEach(featureModel -> assertEquals(Result.get(() -> library1.comparatorGeneralization(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue()))), Result.get(() -> library2.comparatorGeneralization(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue())))));
     }
 
     @Test
     public void testSpecialization() {
-        featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.comparatorSpecialization(featureModel.clone())), Result.get(() -> library2.comparatorSpecialization(featureModel.clone()))));
+        featureModels.entrySet()
+                .stream()
+                .forEach(featureModel -> assertEquals(Result.get(() -> library1.comparatorSpecialization(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue()))), Result.get(() -> library2.comparatorSpecialization(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue())))));
+    }
+
+    public static String getXMLAsString(String strXMLFilePath) {
+        StringBuilder sb = new StringBuilder();
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(new File(strXMLFilePath)));
+            String strLine;
+            while( (strLine = reader.readLine()) != null ) {
+                sb.append(strLine);
+            }
+        }catch(Exception e) {
+            e.printStackTrace();
+        }finally {
+            try {
+                if( reader != null )
+                    reader.close();
+
+            }catch(Exception e) {}
+        }
+        return sb.toString();
     }
 }

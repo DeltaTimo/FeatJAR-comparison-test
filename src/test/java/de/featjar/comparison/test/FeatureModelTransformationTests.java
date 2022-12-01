@@ -1,5 +1,8 @@
 package de.featjar.comparison.test;
 
+import de.featjar.comparison.test.helper.featureide.FeatureIDEBase;
+import de.featjar.comparison.test.helper.featureide.FeatureIDETransformation;
+import de.featjar.comparison.test.helper.Result;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.init.FMCoreLibrary;
 import de.ovgu.featureide.fm.core.init.LibraryManager;
@@ -23,28 +26,25 @@ public class FeatureModelTransformationTests {
             "FeatureModelTransformation/model.xml"
     );
 
-    private static FeatureIDELibrary library1;
-    private static FeatureIDELibrary library2;
+    private static FeatureIDETransformation library1;
+    private static FeatureIDETransformation library2;
+    private static FeatureIDEBase baseOperations;
     private static final List<IFeatureModel> featureModels = new ArrayList<>();
 
 
     @BeforeAll
     public static void setup() {
-        library1 = new FeatureIDELibrary();
-        library2 = new FeatureIDELibrary();
+        baseOperations = new FeatureIDEBase();
+        library1 = new FeatureIDETransformation();
+        library2 = new FeatureIDETransformation();
         modelNames.forEach(module -> {
             try {
-                featureModels.add(loadModel(getPathFromResource(module)));
+                featureModels.add(baseOperations.load(getPathFromResource(module)));
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
+                throw new RuntimeException();
             }
         });
-    }
-
-    private static IFeatureModel loadModel(String filePath) {
-        LibraryManager.registerLibrary(FMCoreLibrary.getInstance());
-        Path path = Paths.get(filePath);
-        return FeatureModelManager.load(path);
     }
 
     private static String getPathFromResource(String resource) throws FileNotFoundException {
