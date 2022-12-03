@@ -16,6 +16,9 @@ import de.ovgu.featureide.fm.core.filter.FeatureSetFilter;
 import org.prop4j.Implies;
 import org.prop4j.Literal;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.util.*;
 
 /**
@@ -25,14 +28,16 @@ import java.util.*;
  */
 public class FeatureIDEModification implements IModification<IFeatureModel> {
 
+    Map<String, String[]> parameters = new HashMap<>();
+
     private IFeatureModelFactory getFMFactory() {
         return DefaultFeatureModelFactory.getInstance();
     }
 
     @Override
-    public Result<Set<String>> addFeature(IFeatureModel featureModel) {
+    public Result<Set<String>> addFeature(IFeatureModel featureModel, String fileName) {
         final IFeatureModelFactory factory = getFMFactory();
-        final IFeature f = factory.createFeature(featureModel, "D");
+        final IFeature f = factory.createFeature(featureModel, parameters.get(fileName)[2]);
         featureModel.addFeature(f);
 
         Set<String> result = new HashSet<>();
@@ -62,9 +67,9 @@ public class FeatureIDEModification implements IModification<IFeatureModel> {
     }
 
     @Override
-    public Result<Set<String>> addConstraint(IFeatureModel featureModel) {
+    public Result<Set<String>> addConstraint(IFeatureModel featureModel, String fileName) {
         final IFeatureModelFactory factory = getFMFactory();
-        final IConstraint c = factory.createConstraint(featureModel, new Implies(new Literal("A"), new Literal("C")));
+        final IConstraint c = factory.createConstraint(featureModel, new Implies(new Literal(parameters.get(fileName)[0]), new Literal(parameters.get(fileName)[1])));
         featureModel.addConstraint(c);
         List<IConstraint> constraintList = featureModel.getConstraints();
         Set<String> constraints = new HashSet<>();
@@ -82,9 +87,9 @@ public class FeatureIDEModification implements IModification<IFeatureModel> {
     }
 
     @Override
-    public Result<Set<String>> slice(IFeatureModel featureModel) {
+    public Result<Set<String>> slice(IFeatureModel featureModel, String fileName) {
         FeatureModelFormula formula = new FeatureModelFormula(featureModel);
-        final IFeature f = featureModel.getFeature("A");
+        final IFeature f = featureModel.getFeature(parameters.get(fileName)[0]);
         Collection<IFeature> sliceFeatures = toCollection(f);
         final CNF slicedCNF = formula.getElement(new SlicedCNFCreator(new FeatureSetFilter(sliceFeatures)) {
             @Override
@@ -99,10 +104,10 @@ public class FeatureIDEModification implements IModification<IFeatureModel> {
     }
 
     @Override
-    public Result<String> comparatorSpecialization(IFeatureModel featureModel) {
+    public Result<String> comparatorSpecialization(IFeatureModel featureModel, String fileName) {
         IFeatureModel tmp = featureModel.clone();
         final IFeatureModelFactory factory = getFMFactory();
-        final IFeature f = factory.createFeature(tmp, "D");
+        final IFeature f = factory.createFeature(tmp, parameters.get(fileName)[2]);
         tmp.addFeature(f);
 
         final ModelComparator comparator = new ModelComparator(1000000);
@@ -111,10 +116,10 @@ public class FeatureIDEModification implements IModification<IFeatureModel> {
     }
 
     @Override
-    public Result<String> comparatorGeneralization(IFeatureModel featureModel) {
+    public Result<String> comparatorGeneralization(IFeatureModel featureModel, String fileName) {
         IFeatureModel tmp = featureModel.clone();
         final IFeatureModelFactory factory = getFMFactory();
-        final IFeature f = factory.createFeature(tmp, "D");
+        final IFeature f = factory.createFeature(tmp, parameters.get(fileName)[2]);
         tmp.addFeature(f);
 
         final ModelComparator comparator = new ModelComparator(1000000);
@@ -126,5 +131,30 @@ public class FeatureIDEModification implements IModification<IFeatureModel> {
         List<IFeature> list = new ArrayList<IFeature>(1);
         list.add(element);
         return list;
+    }
+
+    public void getDataForModification(String filePath) {
+        BufferedReader br = null;
+        try {
+            File file = new File(filePath);
+            br = new BufferedReader(new FileReader(file));
+            String line = null;
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(":");
+                String fileName = parts[0].trim();
+                String[] features = parts[1].trim().split(",");
+
+                if (!fileName.equals("") && features.length>0)
+                    parameters.put(fileName, features);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (Exception e) {}
+            }
+        }
     }
 }

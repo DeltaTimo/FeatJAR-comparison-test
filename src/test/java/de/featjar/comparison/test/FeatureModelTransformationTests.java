@@ -4,25 +4,19 @@ import de.featjar.comparison.test.helper.featureide.FeatureIDEBase;
 import de.featjar.comparison.test.helper.featureide.FeatureIDETransformation;
 import de.featjar.comparison.test.helper.Result;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.init.FMCoreLibrary;
-import de.ovgu.featureide.fm.core.init.LibraryManager;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.FileNotFoundException;
-import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class FeatureModelTransformationTests {
+public class FeatureModelTransformationTests extends ATest{
 
-    private static final List<String> modelNames = Arrays.asList( //
+    private static final List<String> MODEL_NAMES = Arrays.asList( //
             "FeatureModelTransformation/model.xml"
     );
 
@@ -37,7 +31,7 @@ public class FeatureModelTransformationTests {
         baseOperations = new FeatureIDEBase();
         library1 = new FeatureIDETransformation();
         library2 = new FeatureIDETransformation();
-        modelNames.forEach(module -> {
+        MODEL_NAMES.forEach(module -> {
             try {
                 featureModels.add(baseOperations.load(getPathFromResource(module)));
             } catch (FileNotFoundException e) {
@@ -45,15 +39,6 @@ public class FeatureModelTransformationTests {
                 throw new RuntimeException();
             }
         });
-    }
-
-    private static String getPathFromResource(String resource) throws FileNotFoundException {
-        final URL resourceURL = FeatureModelTransformationTests.class.getClassLoader().getResource(resource);
-        if (resourceURL == null) {
-            throw new FileNotFoundException(resource);
-        } else {
-            return resourceURL.getPath().substring(1);
-        }
     }
 
     @Test

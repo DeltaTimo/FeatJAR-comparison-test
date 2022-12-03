@@ -97,7 +97,6 @@ public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
             List<IFeature> falseOptionalFeatures = analyzer.getFalseOptionalFeatures(null);
             Set<String> result = new HashSet<>();
             falseOptionalFeatures.forEach(iFeature -> result.add(iFeature.toString()));
-            System.out.println(result);
             return new Result<>(result);
         }
         return new Result<>();
