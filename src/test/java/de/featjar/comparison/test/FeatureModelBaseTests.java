@@ -3,11 +3,11 @@ package de.featjar.comparison.test;
 import de.featjar.comparison.test.helper.featureide.FeatureIDEBase;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 
-import java.io.FileNotFoundException;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class FeatureModelBaseTests extends ATest{
 
@@ -17,6 +17,12 @@ public class FeatureModelBaseTests extends ATest{
             "FeatureModelAnalysis/car.xml",
             "FeatureModelAnalysis/hidden.xml"
     );
+
+    private static final List<String> WRONG_MODEL_NAMES = Arrays.asList( //
+            "WrongPath/basic.xml",
+            "WrongPath/simple.xml"
+    );
+
     private static FeatureIDEBase baseOperationsLib1;
     private static FeatureIDEBase baseOperationsLib2;
     private static  Map<String,String> featureModelsPaths = new HashMap<>();
@@ -26,12 +32,7 @@ public class FeatureModelBaseTests extends ATest{
         baseOperationsLib1 = new FeatureIDEBase();
         baseOperationsLib2 = new FeatureIDEBase();
         MODEL_NAMES.forEach(module -> {
-            try {
-                featureModelsPaths.put(getPathFromResource(module), getXMLAsString(getPathFromResource(module)));
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-                throw new RuntimeException();
-            }
+            featureModelsPaths.put(getPathFromResource(module), getXMLAsString(getPathFromResource(module)));
         });
     }
 
@@ -40,7 +41,23 @@ public class FeatureModelBaseTests extends ATest{
          featureModelsPaths
                 .entrySet()
                 .stream()
-                .forEach(entry -> assertEquals(baseOperationsLib1.load(entry.getKey()).toString(), baseOperationsLib2.load(entry.getKey()).toString()));
+                .forEach(entry -> {
+                    Executable execute1 = () -> baseOperationsLib1.load(entry.getKey());
+                    assertDoesNotThrow(execute1);
+                    Executable execute2 = () -> baseOperationsLib2.load(entry.getKey());
+                    assertDoesNotThrow(execute2);
+                });
+    }
+
+    @Test
+    public void testLoadWrongPaths() {
+        // testet getPathFromResource method from ATest and load method
+        WRONG_MODEL_NAMES.forEach(wrongPath -> {
+            assertThrows(RuntimeException.class, () -> {
+                baseOperationsLib1.load(getPathFromResource(wrongPath));
+                baseOperationsLib2.load(getPathFromResource(wrongPath));
+            });
+        });
     }
 
     @Test

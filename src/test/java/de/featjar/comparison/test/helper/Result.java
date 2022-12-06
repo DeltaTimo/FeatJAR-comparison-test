@@ -50,4 +50,8 @@ public class Result<T> {
             return new Result<S>();
         }
     }
+
+    public String toString() {
+        return result.toString();
+    }
 }

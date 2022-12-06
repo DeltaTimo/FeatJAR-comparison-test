@@ -32,12 +32,7 @@ public class FeatureModelTransformationTests extends ATest{
         library1 = new FeatureIDETransformation();
         library2 = new FeatureIDETransformation();
         MODEL_NAMES.forEach(module -> {
-            try {
-                featureModels.add(baseOperations.load(getPathFromResource(module)));
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-                throw new RuntimeException();
-            }
+            featureModels.add(baseOperations.load(getPathFromResource(module)));
         });
     }
 

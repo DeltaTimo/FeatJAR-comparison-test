@@ -21,10 +21,14 @@
 package de.featjar.comparison.test;
 
 import de.featjar.comparison.test.helper.Wrapper;
+import de.featjar.comparison.test.helper.featjar.FeatJARAnalyse;
+import de.featjar.comparison.test.helper.featjar.FeatJARBase;
 import de.featjar.comparison.test.helper.featureide.FeatureIDEAnalyse;
 import de.featjar.comparison.test.helper.Result;
 import de.featjar.comparison.test.helper.featureide.FeatureIDEBase;
+import de.featjar.formula.structure.formula.Formula;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.prop4j.*;
@@ -49,24 +53,27 @@ public class FeatureModelAnalysisTests extends ATest{
 	);
 	private static final List<Wrapper> featureModels = new ArrayList<>();
 	private static FeatureIDEBase baseOperationsLib1;
-	private static FeatureIDEBase baseOperationsLib2;
+	private static FeatJARBase baseOperationsLib2;
 	private static FeatureIDEAnalyse library1;
-	private static FeatureIDEAnalyse library2;
+	private static FeatJARAnalyse library2;
 
 	@BeforeAll
 	public static void setup() {
+		// old lib
 		baseOperationsLib1 = new FeatureIDEBase();
-		baseOperationsLib2 = new FeatureIDEBase();
 		library1 = new FeatureIDEAnalyse();
-		library2 = new FeatureIDEAnalyse();
+		// new lib
+		baseOperationsLib2 = new FeatJARBase();
+		library2 = new FeatJARAnalyse();
+
 		MODEL_NAMES.forEach(module -> {
-			try {
-				featureModels.add(new Wrapper(baseOperationsLib1.load(getPathFromResource(module)), baseOperationsLib2.load(getPathFromResource(module))));
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-				throw new RuntimeException();
-			}
+			featureModels.add(new Wrapper(baseOperationsLib1.load(getPathFromResource(module)), baseOperationsLib2.load(getPathFromResource(module))));
 		});
+	}
+
+	@AfterAll
+	public static void cleanUp() {
+		baseOperationsLib2.cleanUp();
 	}
 
 	@Test
@@ -80,46 +87,46 @@ public class FeatureModelAnalysisTests extends ATest{
 
 		map.entrySet()
 				.stream()
-				.forEach(entry -> assertEquals(Result.get(() -> library1.isTautology((IFeatureModel) entry.getKey().getObjectLib1(), (Node) entry.getValue().getObjectLib1())), Result.get(() -> library2.isTautology((IFeatureModel) entry.getKey().getObjectLib2(), (Node) entry.getValue().getObjectLib2()))));
+				.forEach(entry -> assertEquals(Result.get(() -> library1.isTautology((IFeatureModel) entry.getKey().getObjectLib1(), (Node) entry.getValue().getObjectLib1())), Result.get(() -> library2.isTautology((Formula) entry.getKey().getObjectLib2(), entry.getValue().getObjectLib2()))));
 	}
 
 	@Test
 	public void testIsVoid() {
-		featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.isVoid((IFeatureModel) featureModel.getObjectLib1())), Result.get(() -> library2.isVoid((IFeatureModel) featureModel.getObjectLib2()))));
+		featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.isVoid((IFeatureModel) featureModel.getObjectLib1())), Result.get(() -> library2.isVoid((Formula) featureModel.getObjectLib2()))));
 	}
 
 	@Test
 	public void testCoreFeatures() {
-		featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.coreFeatures((IFeatureModel) featureModel.getObjectLib1())), Result.get(() -> library2.coreFeatures((IFeatureModel) featureModel.getObjectLib2()))));
+		featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.coreFeatures((IFeatureModel) featureModel.getObjectLib1())), Result.get(() -> library2.coreFeatures((Formula) featureModel.getObjectLib2()))));
 	}
 
 	@Test
 	public void testDeadFeatures() {
-		featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.deadFeatures((IFeatureModel) featureModel.getObjectLib1())), Result.get(() -> library2.deadFeatures((IFeatureModel) featureModel.getObjectLib2()))));
+		featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.deadFeatures((IFeatureModel) featureModel.getObjectLib1())), Result.get(() -> library2.deadFeatures((Formula) featureModel.getObjectLib2()))));
 	}
 
 	@Test
 	public void testFalseOptional() {
-		featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.falseOptional((IFeatureModel) featureModel.getObjectLib1())), Result.get(() -> library2.falseOptional((IFeatureModel) featureModel.getObjectLib2()))));
+		featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.falseOptional((IFeatureModel) featureModel.getObjectLib1())), Result.get(() -> library2.falseOptional((Formula) featureModel.getObjectLib2()))));
 	}
 
 	@Test
 	public void testRedundantConstraints() {
-		featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.redundantConstraints((IFeatureModel) featureModel.getObjectLib1())), Result.get(() -> library2.redundantConstraints((IFeatureModel) featureModel.getObjectLib2()))));
+		featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.redundantConstraints((IFeatureModel) featureModel.getObjectLib1())), Result.get(() -> library2.redundantConstraints((Formula) featureModel.getObjectLib2()))));
 	}
 
 	@Test
 	public void testAtomicSet() {
-		featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.atomicSets((IFeatureModel) featureModel.getObjectLib1())), Result.get(() -> library2.atomicSets((IFeatureModel) featureModel.getObjectLib2()))));
+		featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.atomicSets((IFeatureModel) featureModel.getObjectLib1())), Result.get(() -> library2.atomicSets((Formula) featureModel.getObjectLib2()))));
 	}
 
 	@Test
 	public void testIndeterminedHiddenFeatures() {
-		featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.indeterminedHiddenFeatures((IFeatureModel) featureModel.getObjectLib1())), Result.get(() -> library2.indeterminedHiddenFeatures((IFeatureModel) featureModel.getObjectLib2()))));
+		featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.indeterminedHiddenFeatures((IFeatureModel) featureModel.getObjectLib1())), Result.get(() -> library2.indeterminedHiddenFeatures((Formula) featureModel.getObjectLib2()))));
 	}
 
 	@Test
 	public void testCountSolutions() {
-		featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.countSolutions((IFeatureModel) featureModel.getObjectLib1())), Result.get(() -> library2.countSolutions((IFeatureModel) featureModel.getObjectLib2()))));
+		featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.countSolutions((IFeatureModel) featureModel.getObjectLib1())), Result.get(() -> library2.countSolutions((Formula) featureModel.getObjectLib2()))));
 	}
 }

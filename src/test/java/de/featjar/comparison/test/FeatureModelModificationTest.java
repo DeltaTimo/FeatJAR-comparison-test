@@ -28,14 +28,9 @@ public class FeatureModelModificationTest extends ATest{
         library1 = new FeatureIDEModification();
         library2 = new FeatureIDEModification();
         MODEL_NAMES.forEach(module -> {
-            try {
-                featureModels.put(getXMLAsString(getPathFromResource(module)), getPathFromResource(module));
-                library1.getDataForModification(getPathFromResource(ADDITONAL_INFO));
-                library2.getDataForModification(getPathFromResource(ADDITONAL_INFO));
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-                throw new RuntimeException();
-            }
+            featureModels.put(getXMLAsString(getPathFromResource(module)), getPathFromResource(module));
+            library1.getDataForModification(getPathFromResource(ADDITONAL_INFO));
+            library2.getDataForModification(getPathFromResource(ADDITONAL_INFO));
         });
     }
 
