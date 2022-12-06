@@ -5,4 +5,5 @@ public interface IBase<T, S> {
     T loadFromSource(String content, String filepath);
     S createQueryImpl(String a, String b);
     S createQueryAndNot(String a, String b);
+    String loadConfiguration(String filepath);
 }

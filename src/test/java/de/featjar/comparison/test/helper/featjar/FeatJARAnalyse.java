@@ -12,6 +12,7 @@ import de.featjar.formula.structure.formula.Formula;
 import de.featjar.formula.transformer.ToCNF;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -29,6 +30,11 @@ public class FeatJARAnalyse implements IAnalyses<Formula, Object> {
                         .then(ToCNF::new)
                         .then(ToLiteralClauseList::new)).setTimeout(new Long(1000));
         return new Result<>(!analyse.compute().get().get());
+    }
+
+    @Override
+    public Result<Boolean> isVoid(Formula featureModel, String config) {
+        return null;
     }
 
     @Override

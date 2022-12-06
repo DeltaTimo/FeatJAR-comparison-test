@@ -40,4 +40,9 @@ public class FeatJARBase implements IBase<Formula, Object> {
     public Object createQueryAndNot(String a, String b) {
         return null;
     }
+
+    @Override
+    public String loadConfiguration(String filepath) {
+        return null;
+    }
 }

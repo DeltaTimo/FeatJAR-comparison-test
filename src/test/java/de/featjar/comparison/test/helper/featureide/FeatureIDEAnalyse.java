@@ -1,9 +1,6 @@
 package de.featjar.comparison.test.helper.featureide;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import de.featjar.comparison.test.helper.IAnalyses;
 import de.featjar.comparison.test.helper.Result;
@@ -11,6 +8,8 @@ import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.CountSolutionsAnalysis;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.configuration.*;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import org.prop4j.Node;
 import org.prop4j.Not;
 
@@ -61,6 +60,17 @@ public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
             return new Result<>(true);
         }
         return new Result<>();
+    }
+
+    @Override
+    public Result<Boolean> isVoid(IFeatureModel featureModel, String config) {
+        final FeatureModelFormula formula = new FeatureModelFormula(featureModel);
+        final Configuration c = new Configuration(formula);
+        final DefaultFormat r = new DefaultFormat();
+        r.read(c, config);
+
+        final IConfigurationPropagator propagator = new ConfigurationPropagator(formula, c);
+        return new Result<>(!LongRunningWrapper.runMethod(propagator.canBeValid()));
     }
 
     @Override
