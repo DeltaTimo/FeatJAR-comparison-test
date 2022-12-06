@@ -3,3 +3,6 @@ pluginManagement {
 }
 
 includeBuild '../base'
+includeBuild '../cli'
+includeBuild '../formula'
+includeBuild '../formula-analysis-sat4j'
