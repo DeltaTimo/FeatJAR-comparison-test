@@ -1,4 +1,4 @@
-package de.featjar.comparison.test.helper;
+package de.featjar.comparison.test.helper.Wrapper;
 
 public class Wrapper {
     private Object library1;
