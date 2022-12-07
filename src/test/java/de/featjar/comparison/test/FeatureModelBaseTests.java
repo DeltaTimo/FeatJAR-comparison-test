@@ -3,7 +3,6 @@ package de.featjar.comparison.test;
 import de.featjar.comparison.test.helper.featureide.FeatureIDEBase;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 
 import java.util.*;
 
@@ -42,10 +41,8 @@ public class FeatureModelBaseTests extends ATest{
                 .entrySet()
                 .stream()
                 .forEach(entry -> {
-                    Executable execute1 = () -> baseOperationsLib1.load(entry.getKey());
-                    assertDoesNotThrow(execute1);
-                    Executable execute2 = () -> baseOperationsLib2.load(entry.getKey());
-                    assertDoesNotThrow(execute2);
+                    assertDoesNotThrow(() -> baseOperationsLib1.load(entry.getKey()));
+                    assertDoesNotThrow(() -> baseOperationsLib2.load(entry.getKey()));
                 });
     }
 
