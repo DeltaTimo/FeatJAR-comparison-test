@@ -37,6 +37,10 @@ public class FeatureIDEModification implements IModification<IFeatureModel> {
     public Object addFeature(IFeatureModel featureModel, String fileName) {
         final IFeatureModelFactory factory = getFMFactory();
         final IFeature f = factory.createFeature(featureModel, parameters.get(fileName)[2]);
+        // nach root einfügen
+        featureModel.getStructure().getRoot().addChild(f.getStructure());
+        f.getStructure().setMandatory(false);
+        f.getStructure().setAbstract(false);
         featureModel.addFeature(f);
 
         Set<String> result = new HashSet<>();
