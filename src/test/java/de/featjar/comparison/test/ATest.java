@@ -11,8 +11,8 @@ public abstract class ATest {
     //TODO test getPathFromResource
     public static void setup() {}
     static String getPathFromResource(String resource) {
-        final URL resourceURL = FeatureModelAnalysisTests.class.getClassLoader().getResource(resource);
-        if (resourceURL == null) {
+        File file = new File(FeatureModelAnalysisTests.class.getClassLoader().getResource(resource).getPath());
+        if (file == null) {
             try {
                 throw new FileNotFoundException(resource);
             } catch (FileNotFoundException e) {
@@ -20,7 +20,7 @@ public abstract class ATest {
                 throw new RuntimeException();
             }
         } else {
-            return resourceURL.getPath().substring(1);
+            return file.toPath().toString();
         }
     }
     //TODO test getXMLAsString
