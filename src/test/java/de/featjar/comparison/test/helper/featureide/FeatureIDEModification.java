@@ -1,7 +1,6 @@
 package de.featjar.comparison.test.helper.featureide;
 
 import de.featjar.comparison.test.helper.IModification;
-import de.featjar.comparison.test.helper.Result;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.SlicedCNFCreator;
@@ -35,7 +34,7 @@ public class FeatureIDEModification implements IModification<IFeatureModel> {
     }
 
     @Override
-    public Result<Set<String>> addFeature(IFeatureModel featureModel, String fileName) {
+    public Object addFeature(IFeatureModel featureModel, String fileName) {
         final IFeatureModelFactory factory = getFMFactory();
         final IFeature f = factory.createFeature(featureModel, parameters.get(fileName)[2]);
         featureModel.addFeature(f);
@@ -46,11 +45,11 @@ public class FeatureIDEModification implements IModification<IFeatureModel> {
         while (features.hasNext()) {
             result.add(features.next().getName());
         }
-        return new Result<>(result);
+        return result;
     }
 
     @Override
-    public Result<List<String>> removeFeature(IFeatureModel featureModel) {
+    public Object removeFeature(IFeatureModel featureModel) {
         Collection<IFeature> c = featureModel.getFeatures();
         Iterator<IFeature> features = c.iterator();
         // delete second feature in model
@@ -63,31 +62,31 @@ public class FeatureIDEModification implements IModification<IFeatureModel> {
             features.next();
             count++;
         }
-        return new Result<>(featureModel.getFeatureOrderList());
+        return featureModel.getFeatureOrderList();
     }
 
     @Override
-    public Result<Set<String>> addConstraint(IFeatureModel featureModel, String fileName) {
+    public Object addConstraint(IFeatureModel featureModel, String fileName) {
         final IFeatureModelFactory factory = getFMFactory();
         final IConstraint c = factory.createConstraint(featureModel, new Implies(new Literal(parameters.get(fileName)[0]), new Literal(parameters.get(fileName)[1])));
         featureModel.addConstraint(c);
         List<IConstraint> constraintList = featureModel.getConstraints();
         Set<String> constraints = new HashSet<>();
         constraintList.forEach(iConstraint -> constraints.add(iConstraint.toString()));
-        return new Result<>(constraints);
+        return constraints;
     }
 
     @Override
-    public Result<Set<String>> removeConstraint(IFeatureModel featureModel) {
+    public Object removeConstraint(IFeatureModel featureModel) {
         featureModel.removeConstraint(0);
         List<IConstraint> constraintList = featureModel.getConstraints();
         Set<String> constraints = new HashSet<>();
         constraintList.forEach(iConstraint -> constraints.add(iConstraint.toString()));
-        return new Result<>(constraints);
+        return constraints;
     }
 
     @Override
-    public Result<Set<String>> slice(IFeatureModel featureModel, String fileName) {
+    public Object slice(IFeatureModel featureModel, String fileName) {
         FeatureModelFormula formula = new FeatureModelFormula(featureModel);
         final IFeature f = featureModel.getFeature(parameters.get(fileName)[0]);
         Collection<IFeature> sliceFeatures = toCollection(f);
@@ -100,11 +99,11 @@ public class FeatureIDEModification implements IModification<IFeatureModel> {
         Set<String> result = new HashSet<>();
         String[] variables = slicedCNF.getVariables().getNames();
         Arrays.stream(variables).forEach(featureName -> result.add(featureName));
-        return new Result<>(result);
+        return result;
     }
 
     @Override
-    public Result<String> comparatorSpecialization(IFeatureModel featureModel, String fileName) {
+    public Object comparatorSpecialization(IFeatureModel featureModel, String fileName) {
         IFeatureModel tmp = featureModel.clone();
         final IFeatureModelFactory factory = getFMFactory();
         final IFeature f = factory.createFeature(tmp, parameters.get(fileName)[2]);
@@ -112,11 +111,11 @@ public class FeatureIDEModification implements IModification<IFeatureModel> {
 
         final ModelComparator comparator = new ModelComparator(1000000);
         final Comparison comparison = comparator.compare(tmp, featureModel);
-        return new Result<>(comparison.toString());
+        return comparison.toString();
     }
 
     @Override
-    public Result<String> comparatorGeneralization(IFeatureModel featureModel, String fileName) {
+    public Object comparatorGeneralization(IFeatureModel featureModel, String fileName) {
         IFeatureModel tmp = featureModel.clone();
         final IFeatureModelFactory factory = getFMFactory();
         final IFeature f = factory.createFeature(tmp, parameters.get(fileName)[2]);
@@ -124,7 +123,7 @@ public class FeatureIDEModification implements IModification<IFeatureModel> {
 
         final ModelComparator comparator = new ModelComparator(1000000);
         final Comparison comparison = comparator.compare(featureModel, tmp);
-        return new Result<>(comparison.toString());
+        return comparison.toString();
     }
 
     public static <IFeature> Collection<IFeature> toCollection(IFeature element) {

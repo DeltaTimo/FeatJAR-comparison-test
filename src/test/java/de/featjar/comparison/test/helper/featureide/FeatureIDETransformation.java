@@ -3,7 +3,6 @@ package de.featjar.comparison.test.helper.featureide;
 import java.nio.file.Paths;
 
 import de.featjar.comparison.test.helper.ITransformations;
-import de.featjar.comparison.test.helper.Result;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -31,31 +30,31 @@ public class FeatureIDETransformation implements ITransformations<IFeatureModel>
         FeatureModelManager.save(model, Paths.get(savePath), format);
     }
 
-    public Result<String> getDimacs(IFeatureModel model) {
+    public Object getDimacs(IFeatureModel model) {
         FeatureModelFormula formula = new FeatureModelFormula(model);
         DimacsWriter dimacsWriter = new DimacsWriter(formula.getCNF());
-        return new Result<>(dimacsWriter.write());
+        return dimacsWriter.write();
     }
 
-    public Result<String> getCNF(IFeatureModel model) {
+    public Object getCNF(IFeatureModel model) {
         FeatureModelFormula formula = new FeatureModelFormula(model);
         CNF cnf = formula.getCNF();
-        return new Result<>(cnf.toString());
+        return cnf.toString();
     }
 
-    public Result<String> getUVL(IFeatureModel model) {
+    public Object getUVL(IFeatureModel model) {
         final IFeatureModelFormat format = new UVLFeatureModelFormat();
-        return new Result<>(format.getInstance().write(model));
+        return format.getInstance().write(model);
     }
 
-    public Result<String> getVelvet(IFeatureModel model) {
+    public Object getVelvet(IFeatureModel model) {
         final IFeatureModelFormat format = new SimpleVelvetFeatureModelFormat();
-        return new Result<>(format.getInstance().write(model));
+        return format.getInstance().write(model);
     }
 
     @Override
-    public Result<String> getSxfml(IFeatureModel model) {
+    public Object getSxfml(IFeatureModel model) {
         final IFeatureModelFormat format = new SXFMFormat();
-        return new Result<>(format.getInstance().write(model));
+        return format.getInstance().write(model);
     }
 }

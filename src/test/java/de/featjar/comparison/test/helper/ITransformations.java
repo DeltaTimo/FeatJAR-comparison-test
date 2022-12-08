@@ -1,9 +1,9 @@
 package de.featjar.comparison.test.helper;
 
 public interface ITransformations<T> {
-    Result<String> getDimacs(T featureModel);
-    Result<String> getCNF(T featureModel);
-    Result<String> getUVL(T featureModel);
-    Result<String> getVelvet(T featureModel);
-    Result<String> getSxfml(T featureModel);
+    Object getDimacs(T featureModel);
+    Object getCNF(T featureModel);
+    Object getUVL(T featureModel);
+    Object getVelvet(T featureModel);
+    Object getSxfml(T featureModel);
 }

@@ -2,7 +2,6 @@ package de.featjar.comparison.test;
 
 import de.featjar.comparison.test.helper.featureide.FeatureIDEBase;
 import de.featjar.comparison.test.helper.featureide.FeatureIDETransformation;
-import de.featjar.comparison.test.helper.Result;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -38,26 +37,26 @@ public class FeatureModelTransformationTests extends ATest{
 
     @Test
     public void testDimacs() {
-        featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.getDimacs(featureModel)), Result.get(() -> library2.getDimacs(featureModel))));
+        featureModels.forEach(featureModel -> assertEquals(run(() -> library1.getDimacs(featureModel)), run(() -> library2.getDimacs(featureModel))));
     }
 
     @Test
     public void testCNF() {
-        featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.getCNF(featureModel)), Result.get(() -> library2.getCNF(featureModel))));
+        featureModels.forEach(featureModel -> assertEquals(run(() -> library1.getCNF(featureModel)), run(() -> library2.getCNF(featureModel))));
     }
 
     @Test
     public void testUVL() {
-        featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.getUVL(featureModel)), Result.get(() -> library2.getUVL(featureModel))));
+        featureModels.forEach(featureModel -> assertEquals(run(() -> library1.getUVL(featureModel)), run(() -> library2.getUVL(featureModel))));
     }
 
     @Test
     public void tetSXFML() {
-        featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.getSxfml(featureModel)), Result.get(() -> library2.getSxfml(featureModel))));
+        featureModels.forEach(featureModel -> assertEquals(run(() -> library1.getSxfml(featureModel)), run(() -> library2.getSxfml(featureModel))));
     }
 
     @Test
     public void testVelvet() {
-        featureModels.forEach(featureModel -> assertEquals(Result.get(() -> library1.getVelvet(featureModel)), Result.get(() -> library2.getVelvet(featureModel))));
+        featureModels.forEach(featureModel -> assertEquals(run(() -> library1.getVelvet(featureModel)), run(() -> library2.getVelvet(featureModel))));
     }
 }

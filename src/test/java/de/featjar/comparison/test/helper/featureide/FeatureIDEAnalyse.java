@@ -3,7 +3,6 @@ package de.featjar.comparison.test.helper.featureide;
 import java.util.*;
 
 import de.featjar.comparison.test.helper.IAnalyses;
-import de.featjar.comparison.test.helper.Result;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.CountSolutionsAnalysis;
 import de.ovgu.featureide.fm.core.base.IConstraint;
@@ -22,7 +21,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
     @Override
-    public Result<Boolean> isTautology(IFeatureModel featureModel, Node query) {
+    public Object isTautology(IFeatureModel featureModel, Node query) {
         if (featureModel != null) {
             FeatureModelFormula formula = new FeatureModelFormula(featureModel);
             final FeatureModelAnalyzer analyzer = formula.getAnalyzer();
@@ -34,99 +33,99 @@ public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
             switch (solver.hasSolution()) {
                 case FALSE:
                     System.out.println("yes");
-                    return new Result<>(true);
+                    return true;
                 case TRUE:
                     System.out.println("no");
-                    return new Result<>(false);
+                    return false;
                 case TIMEOUT:
                     System.out.println("cannot decide (timeout)");
-                    return new Result<>();
+                    return null;
                 default:
                     break;
             }
         } else {
             System.out.println("Feature model could not be read!");
         }
-        return new Result<>();
+        return null;
     }
 
     @Override
-    public Result<Boolean> isVoid(IFeatureModel featureModel) {
+    public Object isVoid(IFeatureModel featureModel) {
         if (featureModel != null) {
             FeatureModelFormula formula = new FeatureModelFormula(featureModel);
             final FeatureModelAnalyzer analyzer = formula.getAnalyzer();
             analyzer.analyzeFeatureModel(null);
-            if(analyzer.isValid(null))  return new Result<>(false);
-            return new Result<>(true);
+            if(analyzer.isValid(null))  return false;
+            return true;
         }
-        return new Result<>();
+        return null;
     }
 
     @Override
-    public Result<Boolean> isVoid(IFeatureModel featureModel, String config) {
+    public Object isVoid(IFeatureModel featureModel, String config) {
         final FeatureModelFormula formula = new FeatureModelFormula(featureModel);
         final Configuration c = new Configuration(formula);
         final DefaultFormat r = new DefaultFormat();
         r.read(c, config);
 
         final IConfigurationPropagator propagator = new ConfigurationPropagator(formula, c);
-        return new Result<>(!LongRunningWrapper.runMethod(propagator.canBeValid()));
+        return !LongRunningWrapper.runMethod(propagator.canBeValid());
     }
 
     @Override
-    public Result<Set<String>> coreFeatures(IFeatureModel featureModel) {
+    public Object coreFeatures(IFeatureModel featureModel) {
         if (featureModel != null) {
             FeatureModelFormula formula = new FeatureModelFormula(featureModel);
             final FeatureModelAnalyzer analyzer = formula.getAnalyzer();
             List<IFeature> core = analyzer.getCoreFeatures(null);
             Set<String> result = new HashSet<>();
             core.forEach(iFeature -> result.add(iFeature.toString()));
-            return new Result<>(result);
+            return result;
         }
-        return new Result<>();
+        return null;
     }
 
     @Override
-    public Result<Set<String>> deadFeatures(IFeatureModel featureModel) {
+    public Object deadFeatures(IFeatureModel featureModel) {
         if (featureModel != null) {
             FeatureModelFormula formula = new FeatureModelFormula(featureModel);
             final FeatureModelAnalyzer analyzer = formula.getAnalyzer();
             List<IFeature> dead = analyzer.getDeadFeatures(null);
             Set<String> result = new HashSet<>();
             dead.forEach(iFeature -> result.add(iFeature.toString()));
-            return new Result<>(result);
+            return result;
         }
-        return new Result<>();
+        return null;
     }
 
     @Override
-    public Result<Set<String>> falseOptional(IFeatureModel featureModel) {
+    public Object falseOptional(IFeatureModel featureModel) {
         if (featureModel != null) {
             FeatureModelFormula formula = new FeatureModelFormula(featureModel);
             final FeatureModelAnalyzer analyzer = formula.getAnalyzer();
             List<IFeature> falseOptionalFeatures = analyzer.getFalseOptionalFeatures(null);
             Set<String> result = new HashSet<>();
             falseOptionalFeatures.forEach(iFeature -> result.add(iFeature.toString()));
-            return new Result<>(result);
+            return result;
         }
-        return new Result<>();
+        return null;
     }
 
     @Override
-    public Result<Set<String>> redundantConstraints(IFeatureModel featureModel) {
+    public Object redundantConstraints(IFeatureModel featureModel) {
         if (featureModel != null) {
             FeatureModelFormula formula = new FeatureModelFormula(featureModel);
             final FeatureModelAnalyzer analyzer = formula.getAnalyzer();
             List<IConstraint> redundantConstraints = analyzer.getRedundantConstraints(null);
             Set<String> result = new HashSet<>();
             redundantConstraints.forEach(iFeature -> result.add(iFeature.getDisplayName()));
-            return new Result<>(result);
+            return result;
         }
-        return new Result<>();
+        return null;
     }
 
     @Override
-    public Result<List<Set<String>>> atomicSets(IFeatureModel featureModel) {
+    public Object atomicSets(IFeatureModel featureModel) {
         if (featureModel != null) {
             FeatureModelFormula formula = new FeatureModelFormula(featureModel);
             final FeatureModelAnalyzer analyzer = formula.getAnalyzer();
@@ -140,31 +139,31 @@ public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
                 result.add(tmp);
             }
         }
-        return new Result<>();
+        return null;
     }
 
     @Override
-    public Result<Set<String>> indeterminedHiddenFeatures(IFeatureModel featureModel) {
+    public Object indeterminedHiddenFeatures(IFeatureModel featureModel) {
         if (featureModel != null) {
             FeatureModelFormula formula = new FeatureModelFormula(featureModel);
             final FeatureModelAnalyzer analyzer = formula.getAnalyzer();
             List<IFeature> analyzerIndeterminedHiddenFeatures = analyzer.getIndeterminedHiddenFeatures(null);
             Set<String> result = new HashSet<>();
             analyzerIndeterminedHiddenFeatures.forEach(iFeature -> result.add(iFeature.toString()));
-            return new Result<>(result);
+            return result;
         }
-        return new Result<>();
+        return null;
     }
 
     @Override
-    public Result<Long> countSolutions(IFeatureModel featureModel) {
+    public Object countSolutions(IFeatureModel featureModel) {
         FeatureModelFormula formula = new FeatureModelFormula(featureModel);
         CNF cnf = formula.getCNF();
         CountSolutionsAnalysis countSolutionsAnalysis = new CountSolutionsAnalysis(cnf);
         try {
-            return new Result<>(countSolutionsAnalysis.analyze(null));
+            return countSolutionsAnalysis.analyze(null);
         } catch (Exception e) {
-            return new Result<>();
+            return null;
         }
     }
 }

@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.net.URL;
+import java.util.concurrent.Callable;
 
 public abstract class ATest {
     //TODO test getPathFromResource
@@ -42,5 +43,14 @@ public abstract class ATest {
             }catch(Exception e) {}
         }
         return sb.toString();
+    }
+
+    static Object run(Callable<?> f)
+    {
+        try {
+            return f.call();
+        } catch (final Exception e) {
+            return e;
+        }
     }
 }

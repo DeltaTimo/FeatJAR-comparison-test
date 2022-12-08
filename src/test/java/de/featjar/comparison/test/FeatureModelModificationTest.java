@@ -2,7 +2,6 @@ package de.featjar.comparison.test;
 
 import de.featjar.comparison.test.helper.featureide.FeatureIDEBase;
 import de.featjar.comparison.test.helper.featureide.FeatureIDEModification;
-import de.featjar.comparison.test.helper.Result;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -38,48 +37,48 @@ public class FeatureModelModificationTest extends ATest{
     public void testAddFeature() {
         featureModels.entrySet()
                 .stream()
-                .forEach(featureModel -> assertEquals(Result.get(() -> library1.addFeature(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue()), new File (featureModel.getValue()).getName())), Result.get(() -> library2.addFeature(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue()), new File (featureModel.getValue()).getName()))));
+                .forEach(featureModel -> assertEquals(run(() -> library1.addFeature(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue()), new File (featureModel.getValue()).getName())), run(() -> library2.addFeature(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue()), new File (featureModel.getValue()).getName()))));
     }
 
     @Test
     public void testRemoveFeature() {
         featureModels.entrySet()
                 .stream()
-                .forEach(featureModel -> assertEquals(Result.get(() -> library1.removeFeature(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue()))), Result.get(() -> library2.removeFeature(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue())))));
+                .forEach(featureModel -> assertEquals(run(() -> library1.removeFeature(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue()))), run(() -> library2.removeFeature(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue())))));
     }
 
     @Test
     public void testRemoveConstraint() {
         featureModels.entrySet()
                 .stream()
-                .forEach(featureModel -> assertEquals(Result.get(() -> library1.removeConstraint(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue()))), Result.get(() -> library2.removeConstraint(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue())))));
+                .forEach(featureModel -> assertEquals(run(() -> library1.removeConstraint(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue()))), run(() -> library2.removeConstraint(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue())))));
     }
 
     @Test
     public void testAddConstraint() {
         featureModels.entrySet()
                 .stream()
-                .forEach(featureModel -> assertEquals(Result.get(() -> library1.addConstraint(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue()), new File (featureModel.getValue()).getName())), Result.get(() -> library2.addConstraint(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue()), new File (featureModel.getValue()).getName()))));
+                .forEach(featureModel -> assertEquals(run(() -> library1.addConstraint(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue()), new File (featureModel.getValue()).getName())), run(() -> library2.addConstraint(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue()), new File (featureModel.getValue()).getName()))));
     }
 
     @Test
     public void testSlice() {
         featureModels.entrySet()
                 .stream()
-                .forEach(featureModel -> assertEquals(Result.get(() -> library1.slice(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue()), new File (featureModel.getValue()).getName())), Result.get(() -> library2.slice(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue()), new File (featureModel.getValue()).getName()))));
+                .forEach(featureModel -> assertEquals(run(() -> library1.slice(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue()), new File (featureModel.getValue()).getName())), run(() -> library2.slice(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue()), new File (featureModel.getValue()).getName()))));
     }
 
     @Test
     public void testGeneralization() {
         featureModels.entrySet()
                 .stream()
-                .forEach(featureModel -> assertEquals(Result.get(() -> library1.comparatorGeneralization(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue()), new File (featureModel.getValue()).getName())), Result.get(() -> library2.comparatorGeneralization(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue()), new File (featureModel.getValue()).getName()))));
+                .forEach(featureModel -> assertEquals(run(() -> library1.comparatorGeneralization(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue()), new File (featureModel.getValue()).getName())), run(() -> library2.comparatorGeneralization(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue()), new File (featureModel.getValue()).getName()))));
     }
 
     @Test
     public void testSpecialization() {
         featureModels.entrySet()
                 .stream()
-                .forEach(featureModel -> assertEquals(Result.get(() -> library1.comparatorSpecialization(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue()), new File (featureModel.getValue()).getName())), Result.get(() -> library2.comparatorSpecialization(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue()), new File (featureModel.getValue()).getName()))));
+                .forEach(featureModel -> assertEquals(run(() -> library1.comparatorSpecialization(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue()), new File (featureModel.getValue()).getName())), run(() -> library2.comparatorSpecialization(baseOperations.loadFromSource(featureModel.getKey(), featureModel.getValue()), new File (featureModel.getValue()).getName()))));
     }
 }
