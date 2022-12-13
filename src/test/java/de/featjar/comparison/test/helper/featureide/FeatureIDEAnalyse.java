@@ -218,6 +218,55 @@ public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
         return null;
     }
 
+        @Override
+    public Object redundantConstraints(IFeatureModel featureModel, String config) {
+        if (featureModel != null) {
+            final FeatureModelFormula formula = new FeatureModelFormula(featureModel);
+            Variables variables = formula.getVariables();
+            CNF cnf = formula.getCNF();
+            SolutionList assumption = parseConfig(config, variables);
+            // constraints as IConstraints
+            List<IConstraint> constraints = featureModel.getConstraints();
+            // Constraints as clauses
+            ArrayList<LiteralSet> constraintClauses = new ArrayList<>();
+            //
+            int[] clauseGroupSize = new int[constraints.size()];
+            int i = 0;
+
+            ClauseList clauses;
+            for(Iterator var4 = constraints.iterator(); var4.hasNext(); clauseGroupSize[i++] = clauses.size()) {
+                IConstraint constraint = (IConstraint)var4.next();
+                clauses = Nodes.convert(variables, constraint.getNode());
+                constraintClauses.addAll(clauses);
+            }
+            // execute analysis
+            RemoveRedundancyAnalysis analysis = new RemoveRedundancyAnalysis(cnf);
+            analysis.setClauseGroupSize(clauseGroupSize);
+            analysis.setClauseList(constraintClauses);
+            analysis.setAssumptions(assumption.getSolutions().get(0));
+
+            IMonitor<List<LiteralSet>> monitor = new NullMonitor();
+            try {
+                List<LiteralSet> result = (List)analysis.analyze(monitor);
+                if (result == null) {
+                    return Collections.emptyList();
+                } else {
+                    List<String> resultList = new ArrayList();
+
+                    for(int j = 0; j < clauseGroupSize.length; ++j) {
+                        if (result.get(j) != null) {
+                            resultList.add(constraints.get(j).toString());
+                        }
+                    }
+                    return resultList;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
     @Override
     public Object atomicSets(IFeatureModel featureModel) {
         if (featureModel != null) {
