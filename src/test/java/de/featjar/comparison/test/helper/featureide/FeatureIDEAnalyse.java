@@ -1,20 +1,28 @@
 package de.featjar.comparison.test.helper.featureide;
 
 import java.util.*;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import de.featjar.comparison.test.helper.IAnalyses;
-import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
+import de.ovgu.featureide.fm.core.analysis.cnf.*;
+import de.ovgu.featureide.fm.core.analysis.cnf.analysis.CoreDeadAnalysis;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.CountSolutionsAnalysis;
+import de.ovgu.featureide.fm.core.analysis.cnf.analysis.IndependentRedundancyAnalysis;
+import de.ovgu.featureide.fm.core.analysis.cnf.analysis.RemoveRedundancyAnalysis;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.*;
+import de.ovgu.featureide.fm.core.filter.OptionalFeatureFilter;
+import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 import org.prop4j.Node;
 import org.prop4j.Not;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
-import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
-import de.ovgu.featureide.fm.core.analysis.cnf.Nodes;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.SimpleSatSolver;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
