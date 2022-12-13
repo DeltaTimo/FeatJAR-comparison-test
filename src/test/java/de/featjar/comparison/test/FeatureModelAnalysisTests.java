@@ -68,8 +68,8 @@ public class FeatureModelAnalysisTests extends ATest{
 		library2 = new FeatJARAnalyse();
 
 		MODEL_NAMES.forEach(module -> {
-			LibraryObject libraryObjectFirst = new LibraryObject(baseOperationsLib1.load(getPathFromResource(module)), "", baseOperationsLib1.loadConfiguration(getPathFromResource(module.replaceFirst(".xml", ".txt"))));
-			LibraryObject libraryObjectSecond = new LibraryObject(baseOperationsLib2.load(getPathFromResource(module)), "", baseOperationsLib2.loadConfiguration(getPathFromResource(module.replaceFirst(".xml", ".txt"))));
+			LibraryObject libraryObjectFirst = new LibraryObject(baseOperationsLib1.load(getPathFromResource(module)), "", baseOperationsLib1.loadConfiguration(getPathFromResource(module.replaceFirst(".xml", ".csv"))));
+			LibraryObject libraryObjectSecond = new LibraryObject(baseOperationsLib2.load(getPathFromResource(module)), "", baseOperationsLib2.loadConfiguration(getPathFromResource(module.replaceFirst(".xml", ".csv"))));
 			featureModels.add(new WrapperLibrary(libraryObjectFirst, libraryObjectSecond));
 		});
 	}
@@ -113,13 +113,36 @@ public class FeatureModelAnalysisTests extends ATest{
 	}
 
 	@Test
+	public void testCoreFeaturesPartialConfig() {
+		featureModels.forEach(featureModel -> assertEquals(run(() -> library1.coreFeatures((IFeatureModel) featureModel.getObjectLib1().getFeatureModel())), run(() -> library2.coreFeatures((Formula) featureModel.getObjectLib2().getFeatureModel()))));
+	}
+
+	@Test
 	public void testDeadFeatures() {
 		featureModels.forEach(featureModel -> assertEquals(run(() -> library1.deadFeatures((IFeatureModel) featureModel.getObjectLib1().getFeatureModel())), run(() -> library2.deadFeatures((Formula) featureModel.getObjectLib2().getFeatureModel()))));
 	}
 
 	@Test
+	public void testDeadFeaturesPartialConfig() {
+		featureModels.forEach(featureModel -> {
+			LibraryObject libraryObjectFirst = featureModel.getObjectLib1();
+			LibraryObject libraryObjectSecond = featureModel.getObjectLib2();
+			assertEquals(run(() -> library1.deadFeatures((IFeatureModel) libraryObjectFirst.getFeatureModel(), libraryObjectFirst.getConfig())), run(() -> library2.deadFeatures((Formula) libraryObjectSecond.getFeatureModel(), libraryObjectSecond.getConfig())));
+		});
+	}
+
+	@Test
 	public void testFalseOptional() {
 		featureModels.forEach(featureModel -> assertEquals(run(() -> library1.falseOptional((IFeatureModel) featureModel.getObjectLib1().getFeatureModel())), run(() -> library2.falseOptional((Formula) featureModel.getObjectLib2().getFeatureModel()))));
+	}
+
+	@Test
+	public void testFalseOptionalPartialConfig() {
+		featureModels.forEach(featureModel -> {
+			LibraryObject libraryObjectFirst = featureModel.getObjectLib1();
+			LibraryObject libraryObjectSecond = featureModel.getObjectLib2();
+			assertEquals(run(() -> library1.falseOptional((IFeatureModel) libraryObjectFirst.getFeatureModel(), libraryObjectFirst.getConfig())), run(() -> library2.falseOptional((Formula) libraryObjectSecond.getFeatureModel(), libraryObjectSecond.getConfig())));
+		});
 	}
 
 	@Test

@@ -156,6 +156,54 @@ public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
     }
 
     @Override
+    public Object falseOptional(IFeatureModel featureModel, String config) {
+        // variables needed for analysis
+        final FeatureModelFormula formula = new FeatureModelFormula(featureModel);
+        Variables variables = formula.getVariables();
+        SolutionList tmp = parseConfig(config, variables);
+        CNF cnf = formula.getCNF();
+
+        // collect all optional features
+        List<IFeature> optionalFeatures = Functional.filterToList(featureModel.getFeatures(), new OptionalFeatureFilter());
+
+        // create Analysis with assumptions -> partial config
+        IndependentRedundancyAnalysis analysis = new IndependentRedundancyAnalysis(cnf);
+        analysis.setAssumptions(tmp.getSolutions().get(0));
+
+        // add clauses from optional features
+        List<LiteralSet> literalSetList = new ArrayList();
+        Iterator var5 = optionalFeatures.iterator();
+
+        while(var5.hasNext()) {
+            IFeature iFeature = (IFeature)var5.next();
+            literalSetList.add(new LiteralSet(new int[]{variables.getVariable(FeatureUtils.getParent(iFeature).getName(), false), variables.getVariable(iFeature.getName(), true)}));
+        }
+        analysis.setClauseList(literalSetList);
+
+        try {
+            // execute analysis
+            IMonitor<List<LiteralSet>> monitor = new NullMonitor();
+            List<LiteralSet> result = (List)analysis.analyze(monitor);
+            if(result == null) return Collections.emptyList();
+
+            // prepare return value
+            List<String> resultList = new ArrayList();
+            int i = 0;
+
+            for(Iterator var6 = result.iterator(); var6.hasNext(); ++i) {
+                LiteralSet iFeature = (LiteralSet)var6.next();
+                if (iFeature != null) {
+                    resultList.add(optionalFeatures.get(i).getName());
+                }
+            }
+            return resultList;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
     public Object redundantConstraints(IFeatureModel featureModel) {
         if (featureModel != null) {
             FeatureModelFormula formula = new FeatureModelFormula(featureModel);

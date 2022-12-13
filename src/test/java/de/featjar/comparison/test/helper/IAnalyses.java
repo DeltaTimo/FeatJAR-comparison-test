@@ -13,6 +13,7 @@ public interface IAnalyses<T, S> {
     Object deadFeatures(T featureModel);
     Object deadFeatures(T featureModel, String config);
     Object falseOptional(T featureModel);
+    Object falseOptional(T featureModel, String config);
     Object redundantConstraints(T featureModel);
     Object atomicSets(T featureModel);
     Object indeterminedHiddenFeatures(T featureModel);

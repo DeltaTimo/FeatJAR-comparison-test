@@ -62,6 +62,11 @@ public class FeatJARAnalyse implements IAnalyses<Formula, Object> {
     }
 
     @Override
+    public Object falseOptional(Formula featureModel, String config) {
+        return null;
+    }
+
+    @Override
     public Object redundantConstraints(Formula formula) {
         return null;
     }
