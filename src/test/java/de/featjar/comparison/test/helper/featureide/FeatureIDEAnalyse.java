@@ -63,13 +63,15 @@ public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
 
     @Override
     public Object isVoid(IFeatureModel featureModel, String config) {
-        final FeatureModelFormula formula = new FeatureModelFormula(featureModel);
-        final Configuration c = new Configuration(formula);
-        final DefaultFormat r = new DefaultFormat();
-        r.read(c, config);
-
-        final IConfigurationPropagator propagator = new ConfigurationPropagator(formula, c);
-        return !LongRunningWrapper.runMethod(propagator.canBeValid());
+        if (featureModel != null) {
+            final FeatureModelFormula formula = new FeatureModelFormula(featureModel);
+            Variables variables = formula.getVariables();
+            SolutionList tmp = parseConfig(config, variables);
+            Configuration c = Configuration.fromLiteralSet(formula,tmp.getSolutions().get(0));
+            final IConfigurationPropagator propagator = new ConfigurationPropagator(formula, c);
+            return !LongRunningWrapper.runMethod(propagator.canBeValid());
+        }
+        return null;
     }
 
     @Override
