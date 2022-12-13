@@ -1,4 +1,0 @@
-Car
-Carbody
-Gearbox
-Manual
