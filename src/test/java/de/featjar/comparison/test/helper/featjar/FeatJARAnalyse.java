@@ -42,7 +42,17 @@ public class FeatJARAnalyse implements IAnalyses<Formula, Object> {
     }
 
     @Override
+    public Object coreFeatures(Formula featureModel, String config) {
+        return null;
+    }
+
+    @Override
     public Object deadFeatures(Formula formula) {
+        return null;
+    }
+
+    @Override
+    public Object deadFeatures(Formula featureModel, String config) {
         return null;
     }
 
@@ -68,6 +78,11 @@ public class FeatJARAnalyse implements IAnalyses<Formula, Object> {
 
     @Override
     public Object countSolutions(Formula formula) {
+        return null;
+    }
+
+    @Override
+    public Object parseConfig(String config, Object variables) {
         return null;
     }
 }

@@ -85,6 +85,28 @@ public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
         return null;
     }
 
+     @Override
+    public Object coreFeatures(IFeatureModel featureModel, String config) {
+        if (featureModel != null) {
+            final FeatureModelFormula formula = new FeatureModelFormula(featureModel);
+            Variables variables = formula.getVariables();
+
+            SolutionList tmp = parseConfig(config, variables);
+            CNF cnf = formula.getCNF();
+            CoreDeadAnalysis coreDeadAnalysis = new CoreDeadAnalysis(cnf, tmp.getSolutions().get(0));
+            try {
+                IMonitor<LiteralSet> monitor = new NullMonitor();
+                LiteralSet coreLiterals = coreDeadAnalysis.analyze(monitor).getPositive();
+                return Arrays.stream(coreLiterals.getPositive().getLiterals())
+                        .mapToObj(l -> variables.getName(l))
+                        .collect(Collectors.joining("\n"));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
     @Override
     public Object deadFeatures(IFeatureModel featureModel) {
         if (featureModel != null) {
@@ -94,6 +116,28 @@ public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
             Set<String> result = new HashSet<>();
             dead.forEach(iFeature -> result.add(iFeature.toString()));
             return result;
+        }
+        return null;
+    }
+
+    @Override
+    public Object deadFeatures(IFeatureModel featureModel, String config) {
+        if (featureModel != null) {
+            final FeatureModelFormula formula = new FeatureModelFormula(featureModel);
+            Variables variables = formula.getVariables();
+
+            SolutionList tmp = parseConfig(config, variables);
+            CNF cnf = formula.getCNF();
+            CoreDeadAnalysis coreDeadAnalysis = new CoreDeadAnalysis(cnf, tmp.getSolutions().get(0));
+            try {
+                IMonitor<LiteralSet> monitor = new NullMonitor();
+                LiteralSet coreLiterals =  coreDeadAnalysis.analyze(monitor).getNegative();
+                return Arrays.stream(coreLiterals.getNegative().getLiterals())
+                        .mapToObj(l -> variables.getName(l))
+                        .collect(Collectors.joining("\n"));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         return null;
     }
@@ -165,5 +209,57 @@ public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public SolutionList parseConfig(String config, Object variables) {
+        int lineNumber = 0;
+        SolutionList configurationList = new SolutionList();
+        configurationList.setVariables((Variables)variables);
+        Scanner scanner = new Scanner(config);
+        scanner.useDelimiter(Pattern.compile("\\n+\\Z|\\n+|\\Z"));
+
+        if (scanner.hasNext()) {
+            String line = scanner.next();
+            String[] split = line.split(";");
+            while(scanner.hasNext()) {
+                line = scanner.next();
+                ++lineNumber;
+                split = line.split(";");
+
+                int[] literals = new int[configurationList.getVariables().size()];
+                int index = 0;
+
+                for(int i = 1; i < split.length; ++i) {
+                    String var12 = split[i];
+                    byte var13 = -1;
+                    switch(var12.hashCode()) {
+                        case 43:
+                            if (var12.equals("+")) var13 = 1;
+                            break;
+                        case 45:
+                            if (var12.equals("-")) var13 = 2;
+                            break;
+                        case 48:
+                            if (var12.equals("0")) var13 = 0;
+                    }
+                    switch(var13) {
+                        case 0:
+                            break;
+                        case 1:
+                            literals[index++] = i;
+                            break;
+                        case 2:
+                            literals[index++] = -i;
+                            break;
+                    }
+                }
+                if (index == configurationList.getVariables().size()) {
+                    configurationList.addSolution(new LiteralSet(literals, LiteralSet.Order.INDEX, false));
+                } else {
+                    configurationList.addSolution(new LiteralSet(Arrays.copyOfRange(literals, 0, index), LiteralSet.Order.UNORDERED, false));
+                }
+            }
+        }
+        return configurationList;
     }
 }

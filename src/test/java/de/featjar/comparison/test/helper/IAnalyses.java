@@ -9,10 +9,13 @@ public interface IAnalyses<T, S> {
     Object isVoid(T featureModel);
     Object isVoid(T featureModel, String config);
     Object coreFeatures(T featureModel);
+    Object coreFeatures(T featureModel, String config);
     Object deadFeatures(T featureModel);
+    Object deadFeatures(T featureModel, String config);
     Object falseOptional(T featureModel);
     Object redundantConstraints(T featureModel);
     Object atomicSets(T featureModel);
     Object indeterminedHiddenFeatures(T featureModel);
     Object countSolutions(T featureModel);
+    Object parseConfig(String config, Object variables);
 }
