@@ -1,6 +1,5 @@
 package de.featjar.comparison.test.helper.featjar;
 
-import de.featjar.base.FeatJAR;
 import de.featjar.base.data.Computation;
 import de.featjar.comparison.test.helper.IAnalyses;
 import de.featjar.formula.analysis.Analysis;
@@ -9,10 +8,6 @@ import de.featjar.formula.analysis.bool.ToLiteralClauseList;
 import de.featjar.formula.analysis.sat4j.SAT4JHasSolutionAnalysis;
 import de.featjar.formula.structure.formula.Formula;
 import de.featjar.formula.transformer.ToCNF;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 
 public class FeatJARAnalyse implements IAnalyses<Formula, Object> {
@@ -88,6 +83,11 @@ public class FeatJARAnalyse implements IAnalyses<Formula, Object> {
 
     @Override
     public Object countSolutions(Formula formula) {
+        return null;
+    }
+
+    @Override
+    public Object countSolutions(Formula featureModel, String config) {
         return null;
     }
 

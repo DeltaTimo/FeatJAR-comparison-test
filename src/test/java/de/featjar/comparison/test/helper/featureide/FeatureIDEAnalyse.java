@@ -318,6 +318,23 @@ public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
         }
     }
 
+    @Override
+    public Object countSolutions(IFeatureModel featureModel, String config) {
+        FeatureModelFormula formula = new FeatureModelFormula(featureModel);
+        CNF cnf = formula.getCNF();
+        Variables variables = formula.getVariables();
+        SolutionList assumption = parseConfig(config, variables);
+
+        CountSolutionsAnalysis countSolutionsAnalysis = new CountSolutionsAnalysis(cnf);
+        System.out.println(assumption.getSolutions().get(0));
+        countSolutionsAnalysis.setAssumptions(assumption.getSolutions().get(0));
+        try {
+            return countSolutionsAnalysis.analyze(null);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public SolutionList parseConfig(String config, Object variables) {
         int lineNumber = 0;
         SolutionList configurationList = new SolutionList();
