@@ -108,13 +108,12 @@ public class FeatureModelAnalysisTests extends ATest{
 	}
 
 	@Test
-	public void testCoreFeatures() {
-		featureModels.forEach(featureModel -> assertEquals(run(() -> library1.coreFeatures((IFeatureModel) featureModel.getObjectLib1().getFeatureModel())), run(() -> library2.coreFeatures((Formula) featureModel.getObjectLib2().getFeatureModel()))));
-	}
-
-	@Test
 	public void testCoreFeaturesPartialConfig() {
-		featureModels.forEach(featureModel -> assertEquals(run(() -> library1.coreFeatures((IFeatureModel) featureModel.getObjectLib1().getFeatureModel())), run(() -> library2.coreFeatures((Formula) featureModel.getObjectLib2().getFeatureModel()))));
+		featureModels.forEach(featureModel -> {
+			LibraryObject libraryObjectFirst = featureModel.getObjectLib1();
+			LibraryObject libraryObjectSecond = featureModel.getObjectLib2();
+			assertEquals(run(() -> library1.coreFeatures((IFeatureModel) libraryObjectFirst.getFeatureModel(), libraryObjectFirst.getConfig())), run(() -> library2.coreFeatures((Formula) libraryObjectSecond.getFeatureModel(), libraryObjectSecond.getConfig())));
+		});
 	}
 
 	@Test
@@ -151,8 +150,26 @@ public class FeatureModelAnalysisTests extends ATest{
 	}
 
 	@Test
+	public void testRedundantConstraintsConfig() {
+		featureModels.forEach(featureModel -> {
+			LibraryObject libraryObjectFirst = featureModel.getObjectLib1();
+			LibraryObject libraryObjectSecond = featureModel.getObjectLib2();
+			assertEquals(run(() -> library1.redundantConstraints((IFeatureModel) libraryObjectFirst.getFeatureModel(), libraryObjectFirst.getConfig())), run(() -> library2.redundantConstraints((Formula) libraryObjectSecond.getFeatureModel(), libraryObjectSecond.getConfig())));
+		});
+	}
+
+	@Test
 	public void testAtomicSet() {
 		featureModels.forEach(featureModel -> assertEquals(run(() -> library1.atomicSets((IFeatureModel) featureModel.getObjectLib1().getFeatureModel())), run(() -> library2.atomicSets((Formula) featureModel.getObjectLib2().getFeatureModel()))));
+	}
+
+	@Test
+	public void testAtomicSetConfig() {
+		featureModels.forEach(featureModel -> {
+			LibraryObject libraryObjectFirst = featureModel.getObjectLib1();
+			LibraryObject libraryObjectSecond = featureModel.getObjectLib2();
+			assertEquals(run(() -> library1.atomicSets((IFeatureModel) libraryObjectFirst.getFeatureModel(), libraryObjectFirst.getConfig())), run(() -> library2.atomicSets((Formula) libraryObjectSecond.getFeatureModel(), libraryObjectSecond.getConfig())));
+		});
 	}
 
 	@Test
@@ -163,5 +180,14 @@ public class FeatureModelAnalysisTests extends ATest{
 	@Test
 	public void testCountSolutions() {
 		featureModels.forEach(featureModel -> assertEquals(run(() -> library1.countSolutions((IFeatureModel) featureModel.getObjectLib1().getFeatureModel())), run(() -> library2.countSolutions((Formula) featureModel.getObjectLib2().getFeatureModel()))));
+	}
+
+	@Test
+	public void testCountSolutionsConfig() {
+		featureModels.forEach(featureModel -> {
+			LibraryObject libraryObjectFirst = featureModel.getObjectLib1();
+			LibraryObject libraryObjectSecond = featureModel.getObjectLib2();
+			assertEquals(run(() -> library1.countSolutions((IFeatureModel) libraryObjectFirst.getFeatureModel(), libraryObjectFirst.getConfig())), run(() -> library2.countSolutions((Formula) libraryObjectSecond.getFeatureModel(), libraryObjectSecond.getConfig())));
+		});
 	}
 }

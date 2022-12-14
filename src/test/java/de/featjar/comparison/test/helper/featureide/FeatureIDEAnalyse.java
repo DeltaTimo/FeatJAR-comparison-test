@@ -389,7 +389,6 @@ public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
         SolutionList assumption = parseConfig(config, variables);
 
         CountSolutionsAnalysis countSolutionsAnalysis = new CountSolutionsAnalysis(cnf);
-        System.out.println(assumption.getSolutions().get(0));
         countSolutionsAnalysis.setAssumptions(assumption.getSolutions().get(0));
         try {
             return countSolutionsAnalysis.analyze(null);
