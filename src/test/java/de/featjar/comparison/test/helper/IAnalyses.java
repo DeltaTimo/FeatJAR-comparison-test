@@ -17,6 +17,7 @@ public interface IAnalyses<T, S> {
     Object redundantConstraints(T featureModel);
     Object redundantConstraints(T featureModel, String config);
     Object atomicSets(T featureModel);
+    Object atomicSets(T featureModel, String config);
     Object indeterminedHiddenFeatures(T featureModel);
     Object countSolutions(T featureModel);
     Object countSolutions(T featureModel, String config);
