@@ -1,15 +1,14 @@
 package de.featjar.comparison.test.helper.featureide;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import de.featjar.comparison.test.helper.IAnalyses;
+import de.ovgu.featureide.fm.core.AnalysesCollection;
 import de.ovgu.featureide.fm.core.analysis.cnf.*;
-import de.ovgu.featureide.fm.core.analysis.cnf.analysis.CoreDeadAnalysis;
-import de.ovgu.featureide.fm.core.analysis.cnf.analysis.CountSolutionsAnalysis;
-import de.ovgu.featureide.fm.core.analysis.cnf.analysis.IndependentRedundancyAnalysis;
-import de.ovgu.featureide.fm.core.analysis.cnf.analysis.RemoveRedundancyAnalysis;
+import de.ovgu.featureide.fm.core.analysis.cnf.analysis.*;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -289,8 +288,72 @@ public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
                 }
                 result.add(tmp);
             }
+            return result;
         }
         return null;
+    }
+
+    @Override
+    public Object atomicSets(IFeatureModel featureModel, String config) {
+        FeatureModelFormula formula = new FeatureModelFormula(featureModel);
+        CNF cnf = formula.getCNF();
+        Variables variables = formula.getVariables();
+        SolutionList assumption = parseConfig(config, variables);
+
+        AtomicSetAnalysis analysis = new AtomicSetAnalysis(cnf);
+        analysis.setAssumptions(assumption.getSolutions().get(0));
+        try {
+            List<LiteralSet> result = analysis.analyze(null);
+
+            if (result == null) {
+                return Collections.emptyList();
+            } else {
+                // transform result to List<List<IFeature>>
+                ArrayList<List<IFeature>> resultList = new ArrayList();
+                Iterator var5 = result.iterator();
+
+                while (var5.hasNext()) {
+                    LiteralSet literalList = (LiteralSet) var5.next();
+                    List<IFeature> setList = new ArrayList();
+                    resultList.add(Functional.mapToList(cnf.getVariables().convertToString(literalList, true, true, false), new StringToFeature(featureModel)));
+
+                    int[] var8 = literalList.getLiterals();
+                    int var9 = var8.length;
+
+                    for (int var10 = 0; var10 < var9; ++var10) {
+                        int literal = var8[var10];
+                        IFeature feature = featureModel.getFeature(cnf.getVariables().getName(literal));
+                        if (feature != null) {
+                            setList.add(feature);
+                        }
+                    }
+                }
+                // prepare for return in form List<String>
+                List<String> res = new ArrayList<>();
+                for(int i = 0; i < resultList.size(); i++) {
+                    String tmp = "";
+                    for(int j = 0; j < resultList.get(i).size(); j++) {
+                        tmp += resultList.get(i).get(j).getName() + " ";
+                    }
+                    res.add(tmp);
+                }
+                return res;
+            }
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    static class StringToFeature implements Function<String, IFeature> {
+        private final IFeatureModel featureModel;
+
+        public StringToFeature(IFeatureModel featureModel) {
+            this.featureModel = featureModel;
+        }
+
+        public IFeature apply(String name) {
+            return this.featureModel.getFeature(name);
+        }
     }
 
     @Override
@@ -311,6 +374,22 @@ public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
         FeatureModelFormula formula = new FeatureModelFormula(featureModel);
         CNF cnf = formula.getCNF();
         CountSolutionsAnalysis countSolutionsAnalysis = new CountSolutionsAnalysis(cnf);
+        try {
+            return countSolutionsAnalysis.analyze(null);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @Override
+    public Object countSolutions(IFeatureModel featureModel, String config) {
+        FeatureModelFormula formula = new FeatureModelFormula(featureModel);
+        CNF cnf = formula.getCNF();
+        Variables variables = formula.getVariables();
+        SolutionList assumption = parseConfig(config, variables);
+
+        CountSolutionsAnalysis countSolutionsAnalysis = new CountSolutionsAnalysis(cnf);
+        countSolutionsAnalysis.setAssumptions(assumption.getSolutions().get(0));
         try {
             return countSolutionsAnalysis.analyze(null);
         } catch (Exception e) {
