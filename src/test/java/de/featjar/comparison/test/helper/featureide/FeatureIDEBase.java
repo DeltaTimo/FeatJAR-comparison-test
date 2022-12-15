@@ -1,6 +1,7 @@
 package de.featjar.comparison.test.helper.featureide;
 
 import de.featjar.comparison.test.helper.IBase;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.init.FMCoreLibrary;
 import de.ovgu.featureide.fm.core.init.LibraryManager;
@@ -21,6 +22,12 @@ public class FeatureIDEBase implements IBase<IFeatureModel, Node> {
         LibraryManager.registerLibrary(FMCoreLibrary.getInstance());
         Path path = Paths.get(filepath);
         return FeatureModelManager.load(path);
+    }
+
+    @Override
+    public Object getFormula(Object featureModel) {
+        FeatureModelFormula formula = new FeatureModelFormula((IFeatureModel) featureModel);
+        return formula.getCNFNode().toString();
     }
 
     @Override

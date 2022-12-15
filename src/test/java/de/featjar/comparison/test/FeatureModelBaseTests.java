@@ -1,5 +1,6 @@
 package de.featjar.comparison.test;
 
+import de.featjar.comparison.test.helper.featjar.FeatJARBase;
 import de.featjar.comparison.test.helper.featureide.FeatureIDEBase;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -7,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FeatureModelBaseTests extends ATest{
 
@@ -23,13 +25,13 @@ public class FeatureModelBaseTests extends ATest{
     );
 
     private static FeatureIDEBase baseOperationsLib1;
-    private static FeatureIDEBase baseOperationsLib2;
+    private static FeatJARBase baseOperationsLib2;
     private static  Map<String,String> featureModelsPaths = new HashMap<>();
 
     @BeforeAll
     public static void setup() {
         baseOperationsLib1 = new FeatureIDEBase();
-        baseOperationsLib2 = new FeatureIDEBase();
+        baseOperationsLib2 = new FeatJARBase();
         MODEL_NAMES.forEach(module -> {
             featureModelsPaths.put(getPathFromResource(module), getXMLAsString(getPathFromResource(module)));
         });
@@ -56,6 +58,19 @@ public class FeatureModelBaseTests extends ATest{
             });
         });
     }
+
+    @Test
+    public void testCompareLoadedFormulars() {
+        featureModelsPaths
+                .entrySet()
+                .stream()
+                .forEach(entry -> {
+                    Object a = baseOperationsLib1.load(entry.getKey());
+                    Object b = baseOperationsLib2.load(entry.getKey());
+                    assertEquals(baseOperationsLib1.getFormula(a), baseOperationsLib2.getFormula(b));
+                });
+    }
+
 
     @Test
     public void testLoadFromSource() {

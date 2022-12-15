@@ -9,6 +9,7 @@ import de.featjar.base.extension.ExtensionPoint;
 import de.featjar.comparison.test.helper.IBase;
 
 import de.featjar.formula.io.FormulaFormats;
+import de.featjar.formula.structure.Expression;
 import de.featjar.formula.structure.formula.Formula;
 
 public class FeatJARBase implements IBase<Formula, Object> {
@@ -21,9 +22,14 @@ public class FeatJARBase implements IBase<Formula, Object> {
 
     @Override
     public Formula load(String filepath) {
-        //Result<Expression> featureModelResult = IO.load(Paths.get(filepath), new XMLFeatureModelFormulaFormat());
-        //System.out.println(featureModelResult.get());
+        Formula f = CommandLineInterface.loadFile(filepath, extensionManager.getExtensionPoint(FormulaFormats.class).get()).orElseThrow();
         return CommandLineInterface.loadFile(filepath, extensionManager.getExtensionPoint(FormulaFormats.class).get()).orElseThrow();
+    }
+
+    @Override
+    public Object getFormula(Object featureModel) {
+        Formula formula = (Formula) featureModel;
+        return  formula.cloneTree().printParseable();
     }
 
     @Override
