@@ -6,4 +6,5 @@ public interface IBase<T, S> {
     S createQueryImpl(String a, String b);
     S createQueryAndNot(String a, String b);
     String loadConfiguration(String filepath);
+    Object getFormula(Object featureModel);
 }
