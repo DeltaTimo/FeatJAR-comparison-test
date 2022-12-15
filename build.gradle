@@ -19,6 +19,8 @@ dependencies {
     implementation files('libs/org.sat4j.core.jar')
     implementation files('libs/uvl-parser.jar')
     implementation files('libs/de.ovgu.featureide.lib.fm-v3.9.0.jar')
+    implementation files('libs/splar.jar')
+    implementation files('libs/SPLCAT.jar')
 }
 
 test {

@@ -17,7 +17,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class FeatureMoelConfigurationGeneratorTest extends ATest {
 
     private static final List<String> MODEL_NAMES = Arrays.asList( //
-            "FeatureModelAnalysis/hidden.xml"
+            "FeatureModelConfigurationGenerator/basic.xml",
+            "FeatureModelConfigurationGenerator/car.xml",
+            "FeatureModelConfigurationGenerator/simple.xml",
+            "FeatureModelConfigurationGenerator/test.xml"
     );
 
     private static final List<WrapperLibrary> featureModels = new ArrayList<>();
@@ -36,8 +39,8 @@ public class FeatureMoelConfigurationGeneratorTest extends ATest {
         library2 = new FeatureIDEConfigurationGenerator();
 
         MODEL_NAMES.forEach(module -> {
-            LibraryObject libraryObjectFirst = new LibraryObject(baseOperationsLib1.load(getPathFromResource(module)), "", baseOperationsLib1.loadConfiguration(getPathFromResource(module.replaceFirst(".xml", ".csv"))));
-            LibraryObject libraryObjectSecond = new LibraryObject(baseOperationsLib2.load(getPathFromResource(module)), "", baseOperationsLib2.loadConfiguration(getPathFromResource(module.replaceFirst(".xml", ".csv"))));
+            LibraryObject libraryObjectFirst = new LibraryObject(baseOperationsLib1.load(getPathFromResource(module)), "","");
+            LibraryObject libraryObjectSecond = new LibraryObject(baseOperationsLib2.load(getPathFromResource(module)), "","");
             featureModels.add(new WrapperLibrary(libraryObjectFirst, libraryObjectSecond));
         });
     }
@@ -53,18 +56,13 @@ public class FeatureMoelConfigurationGeneratorTest extends ATest {
     }
 
     @Test
-    public void testRandomConfigurationGenerator() {
-       // featureModels.forEach(featureModel -> assertEquals(run(() -> library1.random((IFeatureModel) featureModel.getObjectLib1().getFeatureModel())), run(() -> library2.random((IFeatureModel) featureModel.getObjectLib2().getFeatureModel()))));
-    }
-
-    @Test
     public void testIcplConfigurationGenerator() {
-       // featureModels.forEach(featureModel -> assertEquals(run(() -> library1.icpl((IFeatureModel) featureModel.getObjectLib1().getFeatureModel())), run(() -> library2.icpl((IFeatureModel) featureModel.getObjectLib2().getFeatureModel()))));
+        featureModels.forEach(featureModel -> assertEquals(run(() -> library1.icpl((IFeatureModel) featureModel.getObjectLib1().getFeatureModel())), run(() -> library2.icpl((IFeatureModel) featureModel.getObjectLib2().getFeatureModel()))));
     }
 
     @Test
     public void testChvatalConfigurationGenerator() {
-       // featureModels.forEach(featureModel -> assertEquals(run(() -> library1.chvatal((IFeatureModel) featureModel.getObjectLib1().getFeatureModel())), run(() -> library2.chvatal((IFeatureModel) featureModel.getObjectLib2().getFeatureModel()))));
+       featureModels.forEach(featureModel -> assertEquals(run(() -> library1.chvatal((IFeatureModel) featureModel.getObjectLib1().getFeatureModel())), run(() -> library2.chvatal((IFeatureModel) featureModel.getObjectLib2().getFeatureModel()))));
     }
 
 }
