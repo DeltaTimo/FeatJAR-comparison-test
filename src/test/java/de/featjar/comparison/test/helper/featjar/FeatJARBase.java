@@ -1,15 +1,10 @@
 package de.featjar.comparison.test.helper.featjar;
 
-import de.featjar.base.Feat;
-import de.featjar.base.FeatJAR;
 import de.featjar.base.cli.CommandLineInterface;
-import de.featjar.base.data.Result;
 import de.featjar.base.extension.ExtensionManager;
-import de.featjar.base.extension.ExtensionPoint;
 import de.featjar.comparison.test.helper.IBase;
 
 import de.featjar.formula.io.FormulaFormats;
-import de.featjar.formula.structure.Expression;
 import de.featjar.formula.structure.formula.Formula;
 
 public class FeatJARBase implements IBase<Formula, Object> {

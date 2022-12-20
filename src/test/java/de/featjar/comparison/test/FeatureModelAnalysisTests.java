@@ -108,6 +108,11 @@ public class FeatureModelAnalysisTests extends ATest{
 	}
 
 	@Test
+	public void testCoreFeatures() {
+		featureModels.forEach(featureModel -> assertEquals(run(() -> library1.coreFeatures((IFeatureModel) featureModel.getObjectLib1().getFeatureModel())), run(() -> library2.coreFeatures((Formula) featureModel.getObjectLib2().getFeatureModel()))));
+	}
+
+	@Test
 	public void testCoreFeaturesPartialConfig() {
 		featureModels.forEach(featureModel -> {
 			LibraryObject libraryObjectFirst = featureModel.getObjectLib1();
