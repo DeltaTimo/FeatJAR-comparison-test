@@ -7,4 +7,5 @@ public interface IBase<T, S> {
     S createQueryAndNot(String a, String b);
     String loadConfiguration(String filepath);
     Object getFormula(Object featureModel);
+    Object smoothFormula(T formula);
 }

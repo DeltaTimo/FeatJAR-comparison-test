@@ -7,6 +7,15 @@ import de.featjar.comparison.test.helper.IBase;
 import de.featjar.formula.io.FormulaFormats;
 import de.featjar.formula.structure.formula.Formula;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Scanner;
+import java.util.Set;
+import java.util.regex.Pattern;
+
 public class FeatJARBase implements IBase<Formula, Object> {
     protected final ExtensionManager extensionManager = new ExtensionManager();
 
@@ -24,26 +33,81 @@ public class FeatJARBase implements IBase<Formula, Object> {
     @Override
     public Object getFormula(Object featureModel) {
         Formula formula = (Formula) featureModel;
-        return  formula.cloneTree().printParseable();
+        return  formula.printParseable();
+    }
+
+    @Override
+    public Object smoothFormula(Formula formula) {
+        String f = (String) getFormula(formula);
+        String[] splitArr =  f.split("\\&");
+        Set<HashSet> result = new HashSet<>();
+
+        for(int i = 0; i < splitArr.length; i++) {
+            Set<String> tmp = new HashSet<>();
+            String conjunctionParts = splitArr[i].replaceAll("[\\[\\](){}]","");
+            conjunctionParts = conjunctionParts.replaceAll("\\s+","");
+            String[] splitArrTmp;
+            if(conjunctionParts.contains("&")) {
+                splitArrTmp = conjunctionParts.split("\\&");
+                Arrays.stream(splitArrTmp).forEach(entry -> tmp.add(entry));
+            } else if(conjunctionParts.contains("|")) {
+                splitArrTmp = conjunctionParts.split("\\|");
+                Arrays.stream(splitArrTmp).forEach(entry -> tmp.add(entry));
+            } else {
+                tmp.add(conjunctionParts);
+            }
+            result.add((HashSet) tmp);
+        }
+        return result;
     }
 
     @Override
     public Formula loadFromSource(String content, String filepath) {
+        // TODO
         return null;
     }
 
     @Override
     public Object createQueryImpl(String a, String b) {
+        // TODO
         return null;
     }
 
     @Override
     public Object createQueryAndNot(String a, String b) {
+        // TODO
         return null;
     }
 
     @Override
     public String loadConfiguration(String filepath) {
-        return null;
+        String content = null;
+        try {
+            FileInputStream fis = new FileInputStream(filepath);
+            byte[] buffer = new byte[10];
+            StringBuilder sb = new StringBuilder();
+            while (fis.read(buffer) != -1) {
+                sb.append(new String(buffer));
+                buffer = new byte[10];
+            }
+            fis.close();
+            content = sb.toString();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Scanner scanner = new Scanner(content);
+        scanner.useDelimiter(Pattern.compile("\\n+\\Z|\\n+|\\Z"));
+        String result = null;
+        if (scanner.hasNext()) {
+            String line = scanner.next();
+            if(scanner.hasNext()) {
+                result = scanner.next();
+            } else {
+                throw new RuntimeException();
+            }
+        }
+        return result.substring(0, result.length()-2);
     }
 }

@@ -14,6 +14,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.*;
 
 public class FeatureIDEBase implements IBase<IFeatureModel, Node> {
 
@@ -28,6 +29,31 @@ public class FeatureIDEBase implements IBase<IFeatureModel, Node> {
     public Object getFormula(Object featureModel) {
         FeatureModelFormula formula = new FeatureModelFormula((IFeatureModel) featureModel);
         return formula.getCNFNode().toString();
+    }
+
+    @Override
+    public Object smoothFormula(IFeatureModel formula) {
+        String f = (String) getFormula(formula);
+        String[] splitArr =  f.split("\\&");
+        Set<HashSet> result = new HashSet<>();
+        for(int i = 0; i < splitArr.length; i++) {
+            Set<String> tmp = new HashSet<>();
+            String conjunctionParts = splitArr[i].replaceAll("[\\[\\](){}]","");
+            conjunctionParts = conjunctionParts.replaceAll("\\s+","");
+
+            String[] splitArrTmp;
+            if(conjunctionParts.contains("&")) {
+                splitArrTmp = conjunctionParts.split("\\&");
+                Arrays.stream(splitArrTmp).forEach(entry -> tmp.add(entry));
+            } else if(conjunctionParts.contains("|")) {
+                splitArrTmp = conjunctionParts.split("\\|");
+                Arrays.stream(splitArrTmp).forEach(entry -> tmp.add(entry));
+            } else {
+                tmp.add(conjunctionParts);
+            }
+            result.add((HashSet) tmp);
+        }
+        return result;
     }
 
     @Override
