@@ -19,6 +19,7 @@ public interface IAnalyses<T, S> {
     Object atomicSets(T featureModel);
     Object atomicSets(T featureModel, String config);
     Object indeterminedHiddenFeatures(T featureModel);
+    Object indeterminedHiddenFeatures(T featureModel, String config);
     Object countSolutions(T featureModel);
     Object countSolutions(T featureModel, String config);
     Object parseConfig(String config, Object variables);

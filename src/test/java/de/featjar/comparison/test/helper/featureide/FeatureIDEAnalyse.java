@@ -9,10 +9,9 @@ import de.featjar.comparison.test.helper.IAnalyses;
 import de.ovgu.featureide.fm.core.AnalysesCollection;
 import de.ovgu.featureide.fm.core.analysis.cnf.*;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.*;
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
-import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.*;
 import de.ovgu.featureide.fm.core.configuration.*;
+import de.ovgu.featureide.fm.core.filter.HiddenFeatureFilter;
 import de.ovgu.featureide.fm.core.filter.OptionalFeatureFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
@@ -24,7 +23,6 @@ import org.prop4j.Not;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.SimpleSatSolver;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
     @Override
@@ -100,9 +98,9 @@ public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
             final FeatureModelFormula formula = new FeatureModelFormula(featureModel);
             Variables variables = formula.getVariables();
 
-            SolutionList tmp = parseConfig(config, variables);
+            SolutionList assumption = parseConfig(config, variables);
             CNF cnf = formula.getCNF();
-            CoreDeadAnalysis coreDeadAnalysis = new CoreDeadAnalysis(cnf, tmp.getSolutions().get(0));
+            CoreDeadAnalysis coreDeadAnalysis = new CoreDeadAnalysis(cnf, assumption.getSolutions().get(0));
             try {
                 IMonitor<LiteralSet> monitor = new NullMonitor();
                 LiteralSet coreLiterals = coreDeadAnalysis.analyze(monitor).getPositive();
@@ -135,9 +133,9 @@ public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
             final FeatureModelFormula formula = new FeatureModelFormula(featureModel);
             Variables variables = formula.getVariables();
 
-            SolutionList tmp = parseConfig(config, variables);
+            SolutionList assumption = parseConfig(config, variables);
             CNF cnf = formula.getCNF();
-            CoreDeadAnalysis coreDeadAnalysis = new CoreDeadAnalysis(cnf, tmp.getSolutions().get(0));
+            CoreDeadAnalysis coreDeadAnalysis = new CoreDeadAnalysis(cnf, assumption.getSolutions().get(0));
             try {
                 IMonitor<LiteralSet> monitor = new NullMonitor();
                 LiteralSet coreLiterals =  coreDeadAnalysis.analyze(monitor).getNegative();
@@ -169,7 +167,7 @@ public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
         // variables needed for analysis
         final FeatureModelFormula formula = new FeatureModelFormula(featureModel);
         Variables variables = formula.getVariables();
-        SolutionList tmp = parseConfig(config, variables);
+        SolutionList assumption = parseConfig(config, variables);
         CNF cnf = formula.getCNF();
 
         // collect all optional features
@@ -177,7 +175,7 @@ public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
 
         // create Analysis with assumptions -> partial config
         IndependentRedundancyAnalysis analysis = new IndependentRedundancyAnalysis(cnf);
-        analysis.setAssumptions(tmp.getSolutions().get(0));
+        analysis.setAssumptions(assumption.getSolutions().get(0));
 
         // add clauses from optional features
         List<LiteralSet> literalSetList = new ArrayList();
@@ -340,6 +338,7 @@ public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
                 return res;
             }
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -370,6 +369,31 @@ public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
     }
 
     @Override
+    public Object indeterminedHiddenFeatures(IFeatureModel featureModel, String config) {
+        FeatureModelFormula formula = new FeatureModelFormula(featureModel);
+        CNF cnf = formula.getCNF();
+        Variables variables = formula.getVariables();
+        SolutionList assumption = parseConfig(config, variables);
+
+        IndeterminedAnalysis analysis = new IndeterminedAnalysis(cnf);
+        // configureAnalysis
+        LiteralSet convertToVariables = cnf.getVariables().convertToVariables(Functional.mapToList(formula.getFeatureModel().getFeatures(), new HiddenFeatureFilter(), IFeatureModelElement::getName));
+        analysis.setVariables(convertToVariables);
+        analysis.setAssumptions(assumption.getSolutions().get(0));
+        try {
+            IMonitor<LiteralSet> monitor = new NullMonitor();
+            LiteralSet result = analysis.analyze(monitor);
+            List<IFeature> indeterminedHiddenFeatures = Functional.mapToList(formula.getCNF().getVariables().convertToString(result, true, false, false), new StringToFeature(featureModel));
+            Set<String> resultSet = new HashSet<>();
+            indeterminedHiddenFeatures.forEach(iFeature -> resultSet.add(iFeature.toString()));
+            return resultSet;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
     public Object countSolutions(IFeatureModel featureModel) {
         FeatureModelFormula formula = new FeatureModelFormula(featureModel);
         CNF cnf = formula.getCNF();
@@ -377,6 +401,7 @@ public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
         try {
             return countSolutionsAnalysis.analyze(null);
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -393,6 +418,7 @@ public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
         try {
             return countSolutionsAnalysis.analyze(null);
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }

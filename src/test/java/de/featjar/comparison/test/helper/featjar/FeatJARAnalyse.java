@@ -140,6 +140,11 @@ public class FeatJARAnalyse implements IAnalyses<Formula, Object> {
     }
 
     @Override
+    public Object indeterminedHiddenFeatures(Formula featureModel, String config) {
+        return null;
+    }
+
+    @Override
     public Object countSolutions(Formula formula) {
         return null;
     }

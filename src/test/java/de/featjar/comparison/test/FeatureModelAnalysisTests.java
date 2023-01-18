@@ -183,6 +183,15 @@ public class FeatureModelAnalysisTests extends ATest{
 	}
 
 	@Test
+	public void testIndeterminedHiddenFeaturesConfig() {
+		featureModels.forEach(featureModel -> {
+			LibraryObject libraryObjectFirst = featureModel.getObjectLib1();
+			LibraryObject libraryObjectSecond = featureModel.getObjectLib2();
+			assertEquals(run(() -> library1.indeterminedHiddenFeatures((IFeatureModel) libraryObjectFirst.getFeatureModel(), libraryObjectFirst.getConfig())), run(() -> library2.indeterminedHiddenFeatures((Formula) libraryObjectSecond.getFeatureModel(), libraryObjectSecond.getConfig())));
+		});
+	}
+
+	@Test
 	public void testCountSolutions() {
 		featureModels.forEach(featureModel -> assertEquals(run(() -> library1.countSolutions((IFeatureModel) featureModel.getObjectLib1().getFeatureModel())), run(() -> library2.countSolutions((Formula) featureModel.getObjectLib2().getFeatureModel()))));
 	}
