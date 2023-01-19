@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import de.featjar.comparison.test.helper.IAnalyses;
-import de.ovgu.featureide.fm.core.AnalysesCollection;
+import de.featjar.comparison.test.helper.featjar.FeatJARAnalyse;
 import de.ovgu.featureide.fm.core.analysis.cnf.*;
 import de.ovgu.featureide.fm.core.analysis.cnf.analysis.*;
 import de.ovgu.featureide.fm.core.base.*;
@@ -24,7 +24,21 @@ import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.SimpleSatSolver;
 
+/**
+ * This class contains all analyses of the FeatureIDE library.
+ * The interface IAnalyses<IFeatureModel,Node> is implemented and the analyses are
+ * used in the test class FeatureModelAnalysisTests
+ * @author Katjana Herbst
+ * @see de.featjar.comparison.test.FeatureModelAnalysisTests
+ * @see IAnalyses
+ */
 public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
+    /**
+     * checks whether featuremodel is true under all interpretations
+     * @param featureModel featuremodel to analyze
+     * @param query the query which should be tests for tautology
+     * @return true or false
+     */
     @Override
     public Object isTautology(IFeatureModel featureModel, Node query) {
         if (featureModel != null) {
@@ -54,6 +68,11 @@ public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
         return null;
     }
 
+    /**
+     * checks whether featuremodel is void or not
+     * @param featureModel featuremodel to analyze
+     * @return true or false
+     */
     @Override
     public Object isVoid(IFeatureModel featureModel) {
         if (featureModel != null) {
@@ -66,6 +85,13 @@ public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
         return null;
     }
 
+    /**
+     * checks whether featuremodel with partial configuration is void or not
+     * @param featureModel featuremodel to analyze
+     * @param config contains the assumption of the (un)selected features
+     * @return true or false
+     * @see FeatureIDEAnalyse#parseConfig(String, Object)
+     */
     @Override
     public Object isVoid(IFeatureModel featureModel, String config) {
         if (featureModel != null) {
@@ -79,6 +105,11 @@ public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
         return null;
     }
 
+    /**
+     * analyses the featuremodel for core features which must always be selected
+     * @param featureModel featuremodel to analyze
+     * @return core feature set of featuremodel
+     */
     @Override
     public Object coreFeatures(IFeatureModel featureModel) {
         if (featureModel != null) {
@@ -92,6 +123,13 @@ public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
         return null;
     }
 
+    /**
+     * analyses the featuremodel for core features which must always be selected with partial configuration
+     * @param featureModel featuremodel to analyze
+     * @param config contains the assumption of the (un)selected features
+     * @return core feature set of featuremodel
+     * @see FeatJARAnalyse#parseConfig(String, Object)
+     */
      @Override
     public Object coreFeatures(IFeatureModel featureModel, String config) {
         if (featureModel != null) {
@@ -114,6 +152,11 @@ public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
         return null;
     }
 
+    /**
+     * analyses the featuremodel for dead features which can't be selected
+     * @param featureModel featuremodel to analyze
+     * @return dead feature set of featuremodel
+     */
     @Override
     public Object deadFeatures(IFeatureModel featureModel) {
         if (featureModel != null) {
@@ -127,6 +170,13 @@ public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
         return null;
     }
 
+    /**
+     * analyses the featuremodel for dead features which must always be selected with partial configuration
+     * @param featureModel featuremodel to analyze
+     * @param config contains the assumption of the (un)selected features
+     * @return dead feature set of featuremodel
+     * @see FeatJARAnalyse#parseConfig(String, Object)
+     */
     @Override
     public Object deadFeatures(IFeatureModel featureModel, String config) {
         if (featureModel != null) {
@@ -149,6 +199,11 @@ public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
         return null;
     }
 
+    /**
+     * analyses the featuremodel for features which are false optional
+     * @param featureModel featuremodel to analyze
+     * @return false optional feature set of featuremodel
+     */
     @Override
     public Object falseOptional(IFeatureModel featureModel) {
         if (featureModel != null) {
@@ -162,6 +217,13 @@ public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
         return null;
     }
 
+    /**
+     * analyses the featuremodel for features which are false optional with partial configuration
+     * @param featureModel featuremodel to analyze
+     * @param config contains the assumption of the (un)selected features
+     * @return false optional feature set of featuremodel
+     * @see FeatJARAnalyse#parseConfig(String, Object)
+     */
     @Override
     public Object falseOptional(IFeatureModel featureModel, String config) {
         // variables needed for analysis
@@ -210,6 +272,11 @@ public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
         return null;
     }
 
+    /**
+     * analyses the featuremodel for redundant constraints
+     * @param featureModel featuremodel to analyze
+     * @return set of redundant constraints
+     */
     @Override
     public Object redundantConstraints(IFeatureModel featureModel) {
         if (featureModel != null) {
@@ -223,7 +290,14 @@ public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
         return null;
     }
 
-        @Override
+    /**
+     * analyses the featuremodel for redundant constraints of partial configuration
+     * @param featureModel featuremodel to analyze
+     * @param config contains the assumption of the (un)selected features
+     * @return set of redundant constraints
+     * @see FeatJARAnalyse#parseConfig(String, Object)
+     */
+    @Override
     public Object redundantConstraints(IFeatureModel featureModel, String config) {
         if (featureModel != null) {
             final FeatureModelFormula formula = new FeatureModelFormula(featureModel);
@@ -272,6 +346,11 @@ public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
         return null;
     }
 
+    /**
+     * analyses the featuremodel for atomic sets
+     * @param featureModel featuremodel to analyze
+     * @return atomic sets
+     */
     @Override
     public Object atomicSets(IFeatureModel featureModel) {
         if (featureModel != null) {
@@ -291,6 +370,13 @@ public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
         return null;
     }
 
+    /**
+     * analyses the featuremodel for atomic sets of partial configuration
+     * @param featureModel featuremodel to analyze
+     * @param config contains the assumption of the (un)selected features
+     * @return atomic sets
+     * @see FeatJARAnalyse#parseConfig(String, Object)
+     */
     @Override
     public Object atomicSets(IFeatureModel featureModel, String config) {
         FeatureModelFormula formula = new FeatureModelFormula(featureModel);
@@ -343,6 +429,9 @@ public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
         }
     }
 
+    /**
+     * helper class to transform strings into features
+     */
     static class StringToFeature implements Function<String, IFeature> {
         private final IFeatureModel featureModel;
 
@@ -355,6 +444,11 @@ public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
         }
     }
 
+    /**
+     * analyses the featuremodel for idetermined hidden features
+     * @param featureModel featuremodel to analyze
+     * @return set of indetermined hidden features
+     */
     @Override
     public Object indeterminedHiddenFeatures(IFeatureModel featureModel) {
         if (featureModel != null) {
@@ -368,6 +462,14 @@ public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
         return null;
     }
 
+    /**
+     * not implemented yet
+     * analyses the featuremodel for idetermined hidden features of partial configuration
+     * @param featureModel featuremodel to analyze
+     * @param config contains the assumption of the (un)selected features
+     * @return set of indetermined hidden features
+     * @see FeatJARAnalyse#parseConfig(String, Object)
+     */
     @Override
     public Object indeterminedHiddenFeatures(IFeatureModel featureModel, String config) {
         FeatureModelFormula formula = new FeatureModelFormula(featureModel);
@@ -393,6 +495,12 @@ public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
         }
     }
 
+    /**
+     * not implemented yet
+     * count the number of possible solutions of the featuremodel configurations
+     * @param featureModel featuremodel to analyze
+     * @return number
+     */
     @Override
     public Object countSolutions(IFeatureModel featureModel) {
         FeatureModelFormula formula = new FeatureModelFormula(featureModel);
@@ -406,6 +514,13 @@ public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
         }
     }
 
+    /**
+     * count the number of possible solutions of the featuremodel configurations
+     * with partial configuration
+     * @param featureModel featuremodel to analyze
+     * @return number
+     * @see FeatJARAnalyse#parseConfig(String, Object)
+     */
     @Override
     public Object countSolutions(IFeatureModel featureModel, String config) {
         FeatureModelFormula formula = new FeatureModelFormula(featureModel);
@@ -423,6 +538,13 @@ public class FeatureIDEAnalyse implements IAnalyses<IFeatureModel, Node> {
         }
     }
 
+    /**
+     * help method to transform configuration csv to assumption
+     * used for partial configuration
+     * @param config (un)selected features as String
+     * @param variables the all features of the model
+     * @return SolutionList
+     */
     public SolutionList parseConfig(String config, Object variables) {
         int lineNumber = 0;
         SolutionList configurationList = new SolutionList();

@@ -21,9 +21,12 @@ import java.io.FileReader;
 import java.util.*;
 
 /**
- * basic tasks for modifications on featuremodels
- *
+ * This class contains all basic tasks for modifications on featuremodels of the FeatureIDE library.
+ * The interface IModification<IFeatureModel> is implemented and the analyses are
+ * used in the test class FeatureModelModificationTest
  * @author Katjana Herbst
+ * @see de.featjar.comparison.test.FeatureModelModificationTest
+ * @see IModification
  */
 public class FeatureIDEModification implements IModification<IFeatureModel> {
 
@@ -33,6 +36,12 @@ public class FeatureIDEModification implements IModification<IFeatureModel> {
         return DefaultFeatureModelFactory.getInstance();
     }
 
+     /**
+     * add feature to featuremodel
+     * @param featureModel featuremodel to analyze
+     * @param fileName
+     * @return result Set<String>
+     */
     @Override
     public Object addFeature(IFeatureModel featureModel, String fileName) {
         final IFeatureModelFactory factory = getFMFactory();
@@ -52,6 +61,11 @@ public class FeatureIDEModification implements IModification<IFeatureModel> {
         return result;
     }
 
+     /**
+     * remove feature to featuremodel
+     * @param featureModel featuremodel to analyze
+     * @return result List<String>
+     */
     @Override
     public Object removeFeature(IFeatureModel featureModel) {
         Collection<IFeature> c = featureModel.getFeatures();
@@ -69,6 +83,12 @@ public class FeatureIDEModification implements IModification<IFeatureModel> {
         return featureModel.getFeatureOrderList();
     }
 
+     /**
+     * add constraint to featuremodel
+     * @param featureModel featuremodel to analyze
+     * @param fileName
+     * @return constraints Set<String>
+     */
     @Override
     public Object addConstraint(IFeatureModel featureModel, String fileName) {
         final IFeatureModelFactory factory = getFMFactory();
@@ -80,6 +100,11 @@ public class FeatureIDEModification implements IModification<IFeatureModel> {
         return constraints;
     }
 
+     /**
+     * remove constraint to featuremodel
+     * @param featureModel featuremodel to analyze
+     * @return constraints Set<String>
+     */
     @Override
     public Object removeConstraint(IFeatureModel featureModel) {
         featureModel.removeConstraint(0);
@@ -89,6 +114,13 @@ public class FeatureIDEModification implements IModification<IFeatureModel> {
         return constraints;
     }
 
+     /**
+      * slice featuremodel
+      * @param featureModel featuremodel to analyze
+      * @param fileName
+      * @return result Set<String>*
+      * @see FeatureIDEModification#toCollection(Object)
+     */
     @Override
     public Object slice(IFeatureModel featureModel, String fileName) {
         FeatureModelFormula formula = new FeatureModelFormula(featureModel);
@@ -106,6 +138,12 @@ public class FeatureIDEModification implements IModification<IFeatureModel> {
         return result;
     }
 
+     /**
+     * comparator Specialization of the featuremodel
+     * @param featureModel featuremodel to analyze
+     * @param fileName
+     * @return String
+     */
     @Override
     public Object comparatorSpecialization(IFeatureModel featureModel, String fileName) {
         IFeatureModel tmp = featureModel.clone();
@@ -118,6 +156,12 @@ public class FeatureIDEModification implements IModification<IFeatureModel> {
         return comparison.toString();
     }
 
+     /**
+     * comparator Generalization of the featuremodel
+     * @param featureModel featuremodel to analyze
+     * @param fileName
+     * @return String
+     */
     @Override
     public Object comparatorGeneralization(IFeatureModel featureModel, String fileName) {
         IFeatureModel tmp = featureModel.clone();
@@ -130,12 +174,23 @@ public class FeatureIDEModification implements IModification<IFeatureModel> {
         return comparison.toString();
     }
 
+     /**
+      * helper method
+      * @param element IFeature
+      * @return <IFeature> Collection<IFeature>
+     */
     public static <IFeature> Collection<IFeature> toCollection(IFeature element) {
         List<IFeature> list = new ArrayList<IFeature>(1);
         list.add(element);
         return list;
     }
 
+     /**
+      * load data for modification from file in Map<String, String[]>
+      * @param filePath String
+      * @return void
+      * @see FeatureIDEModification#parameters
+     */
     public void getDataForModification(String filePath) {
         BufferedReader br = null;
         try {

@@ -15,10 +15,23 @@ import de.ovgu.featureide.fm.core.job.monitor.ConsoleMonitor;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class contains all algorithms to generate configurations of the FeatureIDE library.
+ * The interface IConfigurationGenerator<IFeatureModel> is implemented and the analyses are
+ * used in the test class FeatureMoelConfigurationGeneratorTest
+ * @author Katjana Herbst
+ * @see de.featjar.comparison.test.FeatureMoelConfigurationGeneratorTest
+ * @see IConfigurationGenerator
+ */
 public class FeatureIDEConfigurationGenerator implements IConfigurationGenerator<IFeatureModel> {
     final private int LIMIT_CONFIGURATION_NUMBER = Integer.MAX_VALUE;
     final private int t = 0;
 
+     /**
+     * generates all pairwise configurations of the featuremodel
+     * @param featureModel featuremodel to analyze
+     * @return resultList List<String>
+     */
     @Override
     public Object pairwise(IFeatureModel featureModel) {
         FeatureModelFormula formula = new FeatureModelFormula(featureModel);
@@ -33,6 +46,11 @@ public class FeatureIDEConfigurationGenerator implements IConfigurationGenerator
         return resultList;
     }
 
+     /**
+     * generates all configurations with icpl of the featuremodel
+     * @param featureModel featuremodel to analyze
+     * @return resultList List<String>
+     */
     @Override
     public Object icpl(IFeatureModel featureModel) {
         FeatureModelFormula formula = new FeatureModelFormula(featureModel);
@@ -47,6 +65,11 @@ public class FeatureIDEConfigurationGenerator implements IConfigurationGenerator
         return resultList;
     }
 
+     /**
+     * generates all configurations with chvatal of the featuremodel
+     * @param featureModel featuremodel to analyze
+     * @return resultList List<String>
+     */
     @Override
     public Object chvatal(IFeatureModel featureModel) {
         FeatureModelFormula formula = new FeatureModelFormula(featureModel);
@@ -61,6 +84,11 @@ public class FeatureIDEConfigurationGenerator implements IConfigurationGenerator
         return resultList;
     }
 
+     /**
+     * generates all configurations of the featuremodel
+     * @param featureModel featuremodel to analyze
+     * @return resultList List<String>
+     */
     @Override
     public Object all(IFeatureModel featureModel) {
         FeatureModelFormula formula = new FeatureModelFormula(featureModel);
@@ -72,6 +100,11 @@ public class FeatureIDEConfigurationGenerator implements IConfigurationGenerator
         return resultList;
     }
 
+    /**
+     * generates random configurations of the featuremodel -> no usage for testing
+     * @param featureModel featuremodel to analyze
+     * @return resultList List<String>
+     */
     @Override
     public Object random(IFeatureModel featureModel) {
         FeatureModelFormula formula = new FeatureModelFormula(featureModel);
