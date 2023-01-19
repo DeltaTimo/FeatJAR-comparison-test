@@ -2,7 +2,6 @@ package de.featjar.comparison.test.helper.featjar;
 
 import de.featjar.base.cli.CommandLineInterface;
 import de.featjar.base.extension.ExtensionManager;
-import de.featjar.comparison.test.helper.IAnalyses;
 import de.featjar.comparison.test.helper.IBase;
 
 import de.featjar.formula.io.FormulaFormats;
@@ -36,7 +35,7 @@ public class FeatJARBase implements IBase<Formula, Object> {
     /**
      * loads the formula of the belonging featuremodel.xml file for analyse
      * @param filepath
-     * @return formula
+     * @return Formula
      */
     @Override
     public Formula load(String filepath) {
@@ -45,7 +44,7 @@ public class FeatJARBase implements IBase<Formula, Object> {
     }
 
     /**
-     * transfers formula into String
+     * transforms formula into String
      * @param featureModel
      * @return formula as String
      */
@@ -56,6 +55,11 @@ public class FeatJARBase implements IBase<Formula, Object> {
     }
 
 
+    /**
+     * transfers formula into String
+     * @param formula Formula
+     * @return HashSet of HashSets of Features as String
+     */
     @Override
     public Object smoothFormula(Formula formula) {
         String f = (String) getFormula(formula);
@@ -85,7 +89,7 @@ public class FeatJARBase implements IBase<Formula, Object> {
      * not implemented yet
      * loads the formula from stored String -> less file access
      * @param filepath
-     * @return formula
+     * @return Formula
      */
     @Override
     public Formula loadFromSource(String content, String filepath) {
@@ -95,24 +99,24 @@ public class FeatJARBase implements IBase<Formula, Object> {
 
     /**
      * not implemented yet
-     * @param a
-     * @param b
+     * @param feature1
+     * @param feature2
      * @return implies query of feature a and b
      */
     @Override
-    public Object createQueryImpl(String a, String b) {
+    public Object createQueryImpl(String feature1, String feature2) {
         // TODO
         return null;
     }
 
     /**
      * not implemented yet
-     * @param a
-     * @param b
+     * @param feature1
+     * @param feature2
      * @return and not query of feature a and b
      */
     @Override
-    public Object createQueryAndNot(String a, String b) {
+    public Object createQueryAndNot(String feature1, String feature2) {
         // TODO
         return null;
     }

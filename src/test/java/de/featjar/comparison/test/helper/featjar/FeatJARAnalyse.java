@@ -25,6 +25,7 @@ import static de.featjar.base.data.Computations.*;
  */
 public class FeatJARAnalyse implements IAnalyses<Formula, Object> {
     /**
+     * not implemented yet
      * checks whether featuremodel is true under all interpretations
      * @param formula the featuremodel as formula to analyze
      * @param query the query which should be tests for tautology
@@ -140,12 +141,13 @@ public class FeatJARAnalyse implements IAnalyses<Formula, Object> {
         });
         return resultDead;
     }
+
     /**
      * not implemented yet
-     * analyses the featuremodel for core features which must always be selected with partial configuration
+     * analyses the featuremodel for dead features which must always be selected with partial configuration
      * @param formula the featuremodel as formula to analyze
      * @param config contains the assumption of the (un)selected features
-     * @return core feature set of featuremodel
+     * @return dead feature set of featuremodel
      * @see FeatJARAnalyse#parseConfig(String, Object)
      */
     @Override
