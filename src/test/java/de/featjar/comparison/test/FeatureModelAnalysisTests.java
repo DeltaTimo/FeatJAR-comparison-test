@@ -20,6 +20,7 @@
  */
 package de.featjar.comparison.test;
 
+import de.featjar.comparison.test.helper.IAnalyses;
 import de.featjar.comparison.test.helper.Wrapper.LibraryObject;
 import de.featjar.comparison.test.helper.Wrapper.Wrapper;
 import de.featjar.comparison.test.helper.Wrapper.WrapperLibrary;
@@ -39,12 +40,20 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * An example usage of the FeatureIDE library for feature-model analysis.
+ * An example usage of the FeatureIDE library and the FeatJAR library for feature-model analysis.
+ * includes the tests between the two libraries and the comparison of the test results.
  *
  * @author Katjana Herbst
+ * @see IAnalyses
+ * @see FeatureIDEAnalyse
+ * @see FeatJARAnalyse
+ * @see org.junit.jupiter.api
  */
 public class FeatureModelAnalysisTests extends ATest{
 
+	 /**
+	  * array that contains the names + location of the featuremodels files
+	 */
 	private static final List<String> MODEL_NAMES = Arrays.asList( //
 			"FeatureModelAnalysis/basic.xml",
 			"FeatureModelAnalysis/simple.xml",
@@ -52,12 +61,24 @@ public class FeatureModelAnalysisTests extends ATest{
 			"FeatureModelAnalysis/hidden.xml"
 	);
 
+	 /**
+	  * List of Wrapper for loaded featuremodels of the two libraries
+	  * @see WrapperLibrary
+	 */
 	private static final List<WrapperLibrary> featureModels = new ArrayList<>();
 	private static FeatureIDEBase baseOperationsLib1;
 	private static FeatJARBase baseOperationsLib2;
 	private static FeatureIDEAnalyse library1;
 	private static FeatJARAnalyse library2;
 
+	 /**
+	  * executed before the tests begin
+	  * uses the base operations of the libraries to load the featuremodel in the corresponding format
+	  * @see FeatureIDEBase base operation of the FeatureIDE library
+	  * @see FeatJARBase base operation of the FeatJAR library
+	  * @see WrapperLibrary Object that contains two LibraryObjects
+	  * @see LibraryObject Object that stores the information of the library inside
+	 */
 	@BeforeAll
 	public static void setup() {
 		// old lib

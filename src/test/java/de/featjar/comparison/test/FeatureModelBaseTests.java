@@ -13,6 +13,16 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
+/**
+ * An example usage of the FeatureIDE library and the FeatJAR library for feature-model base operations.
+ * includes the tests between the two libraries and the comparison of the test results.
+ *
+ * @author Katjana Herbst
+ * @see de.featjar.comparison.test.helper.IBase
+ * @see FeatureIDEBase
+ * @see FeatJARBase
+ * @see org.junit.jupiter.api
+ */
 public class FeatureModelBaseTests extends ATest{
 
     private static final List<String> MODEL_NAMES = Arrays.asList( //

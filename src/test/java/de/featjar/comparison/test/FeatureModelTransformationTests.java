@@ -6,13 +6,21 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * An example usage of the FeatureIDE library and the FeatJAR library for transformations on feature-models.
+ * includes the tests between the two libraries and the comparison of the test results.
+ *
+ * @author Katjana Herbst
+ * @see de.featjar.comparison.test.helper.ITransformations
+ * @see FeatureIDETransformation
+ * @see org.junit.jupiter.api
+ */
 public class FeatureModelTransformationTests extends ATest{
 
     private static final List<String> MODEL_NAMES = Arrays.asList( //

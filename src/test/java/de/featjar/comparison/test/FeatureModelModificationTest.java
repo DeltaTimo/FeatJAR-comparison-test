@@ -6,11 +6,19 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * An example usage of the FeatureIDE library and the FeatJAR library for modifications on feature-model.
+ * includes the tests between the two libraries and the comparison of the test results.
+ *
+ * @author Katjana Herbst
+ * @see de.featjar.comparison.test.helper.IModification
+ * @see FeatureIDEModification
+ * @see org.junit.jupiter.api
+ */
 public class FeatureModelModificationTest extends ATest{
     private static final String ADDITONAL_INFO = "FeatureModelModification/additional.txt";
     private static final List<String> MODEL_NAMES = Arrays.asList( //
