@@ -1,9 +1,12 @@
 package de.featjar.comparison.test.helper;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+/**
+ *
+ * Interface class with methods for analyses.
+ *
+ * @author Katjana Herbst
+ * @since 01-19-2023
+ */
 public interface IAnalyses<T, S> {
     Object isTautology(T featureModel, S query);
     Object isVoid(T featureModel);

@@ -1,8 +1,12 @@
 package de.featjar.comparison.test.helper;
 
-import java.util.List;
-import java.util.Set;
-
+/**
+ *
+ * Interface class with methods for modifications on featuremodels.
+ *
+ * @author Katjana Herbst
+ * @since 01-19-2023
+ */
 public interface IModification<T> {
     Object addFeature(T featureModel, String fileName);
     Object removeFeature(T featureModel);
