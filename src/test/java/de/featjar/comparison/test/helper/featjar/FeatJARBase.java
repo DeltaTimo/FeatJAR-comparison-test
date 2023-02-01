@@ -4,8 +4,14 @@ import de.featjar.base.cli.CommandLineInterface;
 import de.featjar.base.extension.ExtensionManager;
 import de.featjar.comparison.test.helper.IBase;
 
+import de.featjar.comparison.test.helper.tree.StringFormulaTree;
 import de.featjar.formula.io.FormulaFormats;
+import de.featjar.formula.structure.Expression;
 import de.featjar.formula.structure.formula.Formula;
+import de.featjar.formula.structure.formula.connective.*;
+import de.featjar.formula.structure.formula.predicate.Literal;
+import de.featjar.formula.structure.formula.predicate.Predicate;
+import de.featjar.formula.structure.term.value.Value;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -15,6 +21,7 @@ import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * This class contains all base operations of the FeatJAR library.
@@ -54,6 +61,43 @@ public class FeatJARBase implements IBase<Formula, Object> {
         return  formula.printParseable();
     }
 
+    public StringFormulaTree treeFromExpression(Expression formula) {
+        if (formula instanceof Value) {
+            return new StringFormulaTree.Leaf(formula.getName());
+        } else if (formula instanceof Literal) {
+            // Make "not" out of literal.
+            if (formula.getChildren().size() > 1) {
+                throw new IllegalArgumentException("Instance \"Not\" of Node has more than one child. How do we combine them?");
+            } else {
+                if (((Literal) formula).isPositive()) {
+                    return treeFromExpression(formula.getChildren().get(0));
+                } else {
+                    return StringFormulaTree.UnaryOperator.minusNegate(treeFromExpression(formula.getChildren().get(0)));
+                }
+            }
+        } else if (formula instanceof Not) {
+            if (formula.getChildren().size() > 1) {
+                throw new IllegalArgumentException("Instance \"Not\" of Node has more than one child. How do we combine them?");
+            } else {
+                return StringFormulaTree.UnaryOperator.minusNegate(treeFromExpression(formula.getChildren().get(0)));
+            }
+        } else if (formula instanceof Or) {
+            StringFormulaTree result = StringFormulaTree.NAryOperator.plusOr();
+            result.getChildren().addAll(formula.getChildren().stream().map(this::treeFromExpression).collect(Collectors.toList()));
+            return result;
+        } else if (formula instanceof And) {
+            StringFormulaTree result = StringFormulaTree.NAryOperator.asteriskAnd();
+            result.getChildren().addAll(formula.getChildren().stream().map(this::treeFromExpression).collect(Collectors.toList()));
+            return result;
+        } else if (formula instanceof Implies) {
+            if (formula.getChildren().size() != 2) {
+                throw new IllegalArgumentException("Instance \"Implies\" of Node has more than one child. How do we combine them?");
+            } else {
+                return StringFormulaTree.binaryOperator("=>", treeFromExpression(formula.getChildren().get(0)), treeFromExpression(formula.getChildren().get(1)));
+            }
+        }
+        return null;
+    }
 
     /**
      * transfers formula into String
@@ -62,27 +106,7 @@ public class FeatJARBase implements IBase<Formula, Object> {
      */
     @Override
     public Object smoothFormula(Formula formula) {
-        String f = (String) getFormula(formula);
-        String[] splitArr =  f.split("\\&");
-        Set<HashSet> result = new HashSet<>();
-
-        for(int i = 0; i < splitArr.length; i++) {
-            Set<String> tmp = new HashSet<>();
-            String conjunctionParts = splitArr[i].replaceAll("[\\[\\](){}]","");
-            conjunctionParts = conjunctionParts.replaceAll("\\s+","");
-            String[] splitArrTmp;
-            if(conjunctionParts.contains("&")) {
-                splitArrTmp = conjunctionParts.split("\\&");
-                Arrays.stream(splitArrTmp).forEach(entry -> tmp.add(entry));
-            } else if(conjunctionParts.contains("|")) {
-                splitArrTmp = conjunctionParts.split("\\|");
-                Arrays.stream(splitArrTmp).forEach(entry -> tmp.add(entry));
-            } else {
-                tmp.add(conjunctionParts);
-            }
-            result.add((HashSet) tmp);
-        }
-        return result;
+        return treeFromExpression(formula).sort().getValue();
     }
 
     /**
