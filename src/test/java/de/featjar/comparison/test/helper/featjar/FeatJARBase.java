@@ -67,7 +67,7 @@ public class FeatJARBase implements IBase<Formula, Object> {
         } else if (formula instanceof Literal) {
             // Make "not" out of literal.
             if (formula.getChildren().size() > 1) {
-                throw new IllegalArgumentException("Instance \"Not\" of Node has more than one child. How do we combine them?");
+                throw new IllegalArgumentException("Instance \"Literal\" of Node has more than one child. How do we combine them?");
             } else {
                 if (((Literal) formula).isPositive()) {
                     return treeFromExpression(formula.getChildren().get(0));
