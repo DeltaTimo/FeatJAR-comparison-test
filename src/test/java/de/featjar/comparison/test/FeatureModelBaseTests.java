@@ -2,7 +2,7 @@ package de.featjar.comparison.test;
 
 import de.featjar.comparison.test.helper.featjar.FeatJARBase;
 import de.featjar.comparison.test.helper.featureide.FeatureIDEBase;
-import de.featjar.formula.structure.formula.Formula;
+import de.featjar.formula.structure.formula.IFormula;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -93,7 +93,7 @@ public class FeatureModelBaseTests extends ATest{
                 .forEach(entry -> {
                     Object a = baseOperationsLib1.load(entry.getKey());
                     Object b = baseOperationsLib2.load(entry.getKey());
-                    assertEquals(baseOperationsLib1.smoothFormula((IFeatureModel) a), baseOperationsLib2.smoothFormula((Formula) b));
+                    assertEquals(baseOperationsLib1.smoothFormula((IFeatureModel) a), baseOperationsLib2.smoothFormula((IFormula) b));
                 });
     }
 

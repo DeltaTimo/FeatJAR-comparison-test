@@ -1,6 +1,7 @@
 package de.featjar.comparison.test.helper.featureide;
 
 import de.featjar.comparison.test.helper.IBase;
+import de.featjar.comparison.test.helper.tree.StringFormulaTree;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.init.FMCoreLibrary;
@@ -15,6 +16,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class contains all base operations of the FeatureIDE library.
@@ -49,6 +51,44 @@ public class FeatureIDEBase implements IBase<IFeatureModel, Node> {
         return formula.getCNFNode().toString();
     }
 
+    public StringFormulaTree treeFromFeatureModel(IFeatureModel featureModel) {
+        FeatureModelFormula formula = new FeatureModelFormula((IFeatureModel) featureModel);
+        return treeFromFormula(formula.getCNFNode());
+    }
+
+    public StringFormulaTree treeFromFormula(Node node) {
+        if (node instanceof Literal) {
+            return new StringFormulaTree.Leaf(node.toString());
+        } else if (node instanceof Not) {
+            if (node.getChildren().length > 1) {
+                throw new IllegalArgumentException("Instance \"Not\" of Node has more than one child. How do we combine them?");
+            } else {
+                return StringFormulaTree.UnaryOperator.minusNegate(treeFromFormula(node.getChildren()[0]));
+            }
+        } else if (node instanceof Or) {
+            StringFormulaTree result = StringFormulaTree.NAryOperator.plusOr();
+            result.getChildren().addAll(Arrays.stream(node.getChildren()).map(this::treeFromFormula).collect(Collectors.toList()));
+            return result;
+        } else if (node instanceof And) {
+            StringFormulaTree result = StringFormulaTree.NAryOperator.asteriskAnd();
+            result.getChildren().addAll(Arrays.stream(node.getChildren()).map(this::treeFromFormula).collect(Collectors.toList()));
+            return result;
+        } else if (node instanceof Implies) {
+            if (node.getChildren().length != 2) {
+                throw new IllegalArgumentException("Instance \"Implies\" of Node has more than one child. How do we combine them?");
+            } else {
+                return StringFormulaTree.binaryOperator("=>", treeFromFormula(node.getChildren()[0]), treeFromFormula(node.getChildren()[1]));
+            }
+        } else if (node instanceof Equals) {
+            if (node.getChildren().length != 2) {
+                throw new IllegalArgumentException("Instance \"Equals\" of Node has more than one child. How do we combine them?");
+            } else {
+                return StringFormulaTree.binaryOperator("==", treeFromFormula(node.getChildren()[0]), treeFromFormula(node.getChildren()[1]));
+            }
+        }
+        return null;
+}
+
     /**
      * transfers formula into String
      * @param formula IFeatureModel
@@ -56,27 +96,7 @@ public class FeatureIDEBase implements IBase<IFeatureModel, Node> {
      */
     @Override
     public Object smoothFormula(IFeatureModel formula) {
-        String f = (String) getFormula(formula);
-        String[] splitArr =  f.split("\\&");
-        Set<HashSet> result = new HashSet<>();
-        for(int i = 0; i < splitArr.length; i++) {
-            Set<String> tmp = new HashSet<>();
-            String conjunctionParts = splitArr[i].replaceAll("[\\[\\](){}]","");
-            conjunctionParts = conjunctionParts.replaceAll("\\s+","");
-
-            String[] splitArrTmp;
-            if(conjunctionParts.contains("&")) {
-                splitArrTmp = conjunctionParts.split("\\&");
-                Arrays.stream(splitArrTmp).forEach(entry -> tmp.add(entry));
-            } else if(conjunctionParts.contains("|")) {
-                splitArrTmp = conjunctionParts.split("\\|");
-                Arrays.stream(splitArrTmp).forEach(entry -> tmp.add(entry));
-            } else {
-                tmp.add(conjunctionParts);
-            }
-            result.add((HashSet) tmp);
-        }
-        return result;
+        return treeFromFeatureModel(formula).sort().getValue();
     }
 
     /**
