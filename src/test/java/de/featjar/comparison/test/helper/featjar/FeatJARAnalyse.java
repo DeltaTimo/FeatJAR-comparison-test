@@ -1,19 +1,25 @@
 package de.featjar.comparison.test.helper.featjar;
 
-import de.featjar.base.data.Computation;
+import de.featjar.base.computation.Computations;
+import de.featjar.base.computation.ComputePresence;
+import de.featjar.cli.analysis.ComputeSolutionCountSharpSAT;
 import de.featjar.comparison.test.helper.IAnalyses;
-import de.featjar.formula.analysis.bool.ComputeBooleanRepresentation;
-import de.featjar.formula.analysis.sat4j.AnalyzeHasSolutionSAT4J;
-import de.featjar.formula.analysis.value.ComputeValueRepresentation;
+import de.featjar.formula.analysis.bool.BooleanSolution;
+import de.featjar.formula.analysis.bool.ComputeBooleanRepresentationOfCNFFormula;
+import de.featjar.formula.analysis.sat4j.ComputeAtomicSetsSAT4J;
+import de.featjar.formula.analysis.sat4j.ComputeCoreDeadVariablesSAT4J;
+import de.featjar.formula.analysis.sat4j.ComputeSolutionCountSAT4J;
+import de.featjar.formula.analysis.sat4j.ComputeSolutionSAT4J;
+import de.featjar.formula.analysis.value.ComputeValueRepresentationOfAssignment;
+import de.featjar.formula.analysis.value.ComputeValueRepresentationOfSolutionList;
 import de.featjar.formula.analysis.value.ValueAssignment;
-import de.featjar.formula.structure.formula.Formula;
+import de.featjar.formula.structure.formula.IFormula;
 import de.featjar.formula.transformer.ComputeCNFFormula;
 import de.featjar.formula.transformer.ComputeNNFFormula;
-import de.featjar.formula.analysis.sat4j.AnalyzeCoreDeadVariablesSAT4J;
 
 import java.util.*;
 
-import static de.featjar.base.data.Computations.*;
+import static de.featjar.base.computation.Computations.*;
 
 /**
  * This class contains all analyses of the FeatJAR library.
@@ -23,7 +29,7 @@ import static de.featjar.base.data.Computations.*;
  * @see de.featjar.comparison.test.FeatureModelAnalysisTests
  * @see IAnalyses
  */
-public class FeatJARAnalyse implements IAnalyses<Formula, Object> {
+public class FeatJARAnalyse implements IAnalyses<IFormula, Object> {
     /**
      * not implemented yet
      * checks whether featuremodel is true under all interpretations
@@ -32,7 +38,7 @@ public class FeatJARAnalyse implements IAnalyses<Formula, Object> {
      * @return true or false
      */
     @Override
-    public Object isTautology(Formula formula, Object query) {
+    public Object isTautology(IFormula formula, Object query) {
         return null;
     }
 
@@ -42,20 +48,17 @@ public class FeatJARAnalyse implements IAnalyses<Formula, Object> {
      * @return true or false
      */
     @Override
-    public Object isVoid(Formula formula) {
-        var booleanRepresentation =
-                async(formula)
-                        .map(ComputeNNFFormula::new)
-                        .map(ComputeCNFFormula::new)
-                        .map(ComputeBooleanRepresentation.OfFormula::new);
-        var booleanClauseList = getKey(booleanRepresentation);
-        var result = new AnalyzeHasSolutionSAT4J().setInput(booleanClauseList);
-        /*
-        Analysis<BooleanClauseList, Boolean> analyse = new AnalyzeHasSolutionSAT4J(
-                Computation.of(formula).then(ToCNF::new)
-                        .then(ToLiteralClauseList::new)).setTimeout(new Long(1000));
-        return !analyse.compute().get().get();*/
-        return !result.compute().get().get();
+    public Object isVoid(IFormula formula) {
+        boolean isvoid = !async(formula)
+                .map(ComputeNNFFormula::new)
+                .map(ComputeCNFFormula::new)
+                .map(ComputeBooleanRepresentationOfCNFFormula::new)
+                .map(Computations::getKey)
+                .map(ComputeSolutionSAT4J::new)
+                .map(ComputePresence<BooleanSolution>::new)
+                .get()
+                .get();
+        return isvoid;
     }
 
     /**
@@ -67,7 +70,7 @@ public class FeatJARAnalyse implements IAnalyses<Formula, Object> {
      * @see FeatJARAnalyse#parseConfig(String, Object)
      */
     @Override
-    public Object isVoid(Formula formula, String config) {
+    public Object isVoid(IFormula formula, String config) {
         return null;
     }
 
@@ -77,19 +80,18 @@ public class FeatJARAnalyse implements IAnalyses<Formula, Object> {
      * @return core feature set of featuremodel
      */
     @Override
-    public Object coreFeatures(Formula formula) {
-        var booleanRepresentation =
-                async(formula)
-                        .map(ComputeNNFFormula::new)
-                        .map(ComputeCNFFormula::new)
-                        .map(ComputeBooleanRepresentation.OfFormula::new);
+    public Object coreFeatures(IFormula formula) {
+        var booleanRepresentation = async(formula)
+                .map(ComputeNNFFormula::new)
+                .map(ComputeCNFFormula::new)
+                .map(ComputeBooleanRepresentationOfCNFFormula::new);
         var booleanClauseList = getKey(booleanRepresentation);
         var variableMap = getValue(booleanRepresentation);
-        var result = new AnalyzeCoreDeadVariablesSAT4J().setInput(booleanClauseList);
+        var analysis = new ComputeCoreDeadVariablesSAT4J(booleanClauseList);
 
         //  parse result
-        Computation<ValueAssignment> assignmentComputation = async(result, variableMap).map(ComputeValueRepresentation.OfAssignment::new);
-        String core = assignmentComputation.compute().get().get().print();
+        ComputeValueRepresentationOfAssignment result = new ComputeValueRepresentationOfAssignment(analysis, variableMap);
+        String core = result.computeResult().get().print();
         String[] coreArr = core.split(", ");
         Set<String> resultCore = new HashSet<>();
         Arrays.stream(coreArr).forEach(feature -> {
@@ -109,7 +111,7 @@ public class FeatJARAnalyse implements IAnalyses<Formula, Object> {
      * @see FeatJARAnalyse#parseConfig(String, Object)
      */
     @Override
-    public Object coreFeatures(Formula formula, String config) {
+    public Object coreFeatures(IFormula formula, String config) {
         return null;
     }
 
@@ -119,22 +121,21 @@ public class FeatJARAnalyse implements IAnalyses<Formula, Object> {
      * @return dead feature set of featuremodel
      */
     @Override
-    public Object deadFeatures(Formula formula) {
-        var booleanRepresentation =
-                async(formula)
-                        .map(ComputeNNFFormula::new)
-                        .map(ComputeCNFFormula::new)
-                        .map(ComputeBooleanRepresentation.OfFormula::new);
+    public Object deadFeatures(IFormula formula) {
+        var booleanRepresentation = async(formula)
+                .map(ComputeNNFFormula::new)
+                .map(ComputeCNFFormula::new)
+                .map(ComputeBooleanRepresentationOfCNFFormula::new);
         var booleanClauseList = getKey(booleanRepresentation);
         var variableMap = getValue(booleanRepresentation);
-        var result = new AnalyzeCoreDeadVariablesSAT4J().setInput(booleanClauseList);
+        var analysis = new ComputeCoreDeadVariablesSAT4J(booleanClauseList);
 
         //  parse result
-        Computation<ValueAssignment> assignmentComputation = async(result, variableMap).map(ComputeValueRepresentation.OfAssignment::new);
-        String core = assignmentComputation.compute().get().get().print();
-        String[] coreArr = core.split(", ");
+        ComputeValueRepresentationOfAssignment result = new ComputeValueRepresentationOfAssignment(analysis, variableMap);
+        String core = result.computeResult().get().print();
+        String[] deadArr = core.split(", ");
         Set<String> resultDead = new HashSet<>();
-        Arrays.stream(coreArr).forEach(feature -> {
+        Arrays.stream(deadArr).forEach(feature -> {
             if((feature.charAt(0)=='-')) {
                 resultDead.add(feature.replace("-", ""));
             }
@@ -151,7 +152,7 @@ public class FeatJARAnalyse implements IAnalyses<Formula, Object> {
      * @see FeatJARAnalyse#parseConfig(String, Object)
      */
     @Override
-    public Object deadFeatures(Formula formula, String config) {
+    public Object deadFeatures(IFormula formula, String config) {
         return null;
     }
 
@@ -162,7 +163,7 @@ public class FeatJARAnalyse implements IAnalyses<Formula, Object> {
      * @return false optional feature set of featuremodel
      */
     @Override
-    public Object falseOptional(Formula formula) {
+    public Object falseOptional(IFormula formula) {
         return null;
     }
 
@@ -175,7 +176,7 @@ public class FeatJARAnalyse implements IAnalyses<Formula, Object> {
      * @see FeatJARAnalyse#parseConfig(String, Object)
      */
     @Override
-    public Object falseOptional(Formula formula, String config) {
+    public Object falseOptional(IFormula formula, String config) {
         return null;
     }
 
@@ -186,7 +187,7 @@ public class FeatJARAnalyse implements IAnalyses<Formula, Object> {
      * @return set of redundant constraints
      */
     @Override
-    public Object redundantConstraints(Formula formula) {
+    public Object redundantConstraints(IFormula formula) {
         return null;
     }
 
@@ -199,7 +200,7 @@ public class FeatJARAnalyse implements IAnalyses<Formula, Object> {
      * @see FeatJARAnalyse#parseConfig(String, Object)
      */
     @Override
-    public Object redundantConstraints(Formula formula, String config) {
+    public Object redundantConstraints(IFormula formula, String config) {
         return null;
     }
 
@@ -210,7 +211,7 @@ public class FeatJARAnalyse implements IAnalyses<Formula, Object> {
      * @return atomic sets
      */
     @Override
-    public Object atomicSets(Formula formula) {
+    public Object atomicSets(IFormula formula) {
         return null;
     }
 
@@ -223,7 +224,7 @@ public class FeatJARAnalyse implements IAnalyses<Formula, Object> {
      * @see FeatJARAnalyse#parseConfig(String, Object)
      */
     @Override
-    public Object atomicSets(Formula formula, String config) {
+    public Object atomicSets(IFormula formula, String config) {
         return null;
     }
 
@@ -234,7 +235,7 @@ public class FeatJARAnalyse implements IAnalyses<Formula, Object> {
      * @return set of indetermined hidden features
      */
     @Override
-    public Object indeterminedHiddenFeatures(Formula formula) {
+    public Object indeterminedHiddenFeatures(IFormula formula) {
         return null;
     }
 
@@ -247,7 +248,7 @@ public class FeatJARAnalyse implements IAnalyses<Formula, Object> {
      * @see FeatJARAnalyse#parseConfig(String, Object)
      */
     @Override
-    public Object indeterminedHiddenFeatures(Formula formula, String config) {
+    public Object indeterminedHiddenFeatures(IFormula formula, String config) {
         return null;
     }
 
@@ -258,7 +259,7 @@ public class FeatJARAnalyse implements IAnalyses<Formula, Object> {
      * @return number
      */
     @Override
-    public Object countSolutions(Formula formula) {
+    public Object countSolutions(IFormula formula) {
         return null;
     }
 
@@ -271,7 +272,7 @@ public class FeatJARAnalyse implements IAnalyses<Formula, Object> {
      * @see FeatJARAnalyse#parseConfig(String, Object)
      */
     @Override
-    public Object countSolutions(Formula formula, String config) {
+    public Object countSolutions(IFormula formula, String config) {
         return null;
     }
 
