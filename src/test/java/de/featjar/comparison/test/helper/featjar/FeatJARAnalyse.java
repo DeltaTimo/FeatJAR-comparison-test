@@ -273,7 +273,21 @@ public class FeatJARAnalyse implements IAnalyses<IFormula, Object> {
      */
     @Override
     public Object countSolutions(IFormula formula) {
-        return null;
+        // TODO SharpSAT Error:   class file for de.featjar.formula.analysis.sharpsat.ASharpSATAnalysis not found
+       /*
+        var cnfFormula = async(formula)
+                .map(ComputeNNFFormula::new)
+                .map(ComputeCNFFormula::new);
+        var analysis = new ComputeSolutionCountSharpSAT().newAnalysis(cnfFormula);
+        return analysis.computeResult().get();*/
+
+        var booleanRepresentation = async(formula)
+                .map(ComputeNNFFormula::new)
+                .map(ComputeCNFFormula::new)
+                .map(ComputeBooleanRepresentationOfCNFFormula::new);
+        var booleanClauseList = getKey(booleanRepresentation);
+        var analysis = new ComputeSolutionCountSAT4J(booleanClauseList);
+        return analysis.get().get().longValueExact();
     }
 
     /**
