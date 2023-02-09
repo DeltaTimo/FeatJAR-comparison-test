@@ -1,17 +1,17 @@
 package de.featjar.comparison.test.helper.featjar;
 
-import de.featjar.base.cli.CommandLineInterface;
+import de.featjar.base.cli.Commands;
 import de.featjar.base.extension.ExtensionManager;
 import de.featjar.comparison.test.helper.IBase;
 
 import de.featjar.comparison.test.helper.tree.StringFormulaTree;
 import de.featjar.formula.io.FormulaFormats;
-import de.featjar.formula.structure.Expression;
-import de.featjar.formula.structure.formula.Formula;
+//import de.featjar.formula.structure.Expression;
+import de.featjar.formula.structure.formula.IFormula;
 import de.featjar.formula.structure.formula.connective.*;
 import de.featjar.formula.structure.formula.predicate.Literal;
-import de.featjar.formula.structure.formula.predicate.Predicate;
-import de.featjar.formula.structure.term.value.Value;
+//import de.featjar.formula.structure.formula.predicate.Predicate;
+//import de.featjar.formula.structure.term.value.Value;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
  * @see de.featjar.comparison.test.FeatureModelBaseTests
  * @see IBase
  */
-public class FeatJARBase implements IBase<Formula, Object> {
+public class FeatJARBase implements IBase<IFormula, Object> {
     protected final ExtensionManager extensionManager = new ExtensionManager();
 
     // close Extensionmanager
@@ -45,9 +45,8 @@ public class FeatJARBase implements IBase<Formula, Object> {
      * @return Formula
      */
     @Override
-    public Formula load(String filepath) {
-        Formula f = CommandLineInterface.loadFile(filepath, extensionManager.getExtensionPoint(FormulaFormats.class).get()).orElseThrow();
-        return CommandLineInterface.loadFile(filepath, extensionManager.getExtensionPoint(FormulaFormats.class).get()).orElseThrow();
+    public IFormula load(String filepath) {
+        return Commands.loadFile(filepath, extensionManager.getExtensionPoint(FormulaFormats.class).get()).orElseThrow();
     }
 
     /**
@@ -57,10 +56,12 @@ public class FeatJARBase implements IBase<Formula, Object> {
      */
     @Override
     public Object getFormula(Object featureModel) {
-        Formula formula = (Formula) featureModel;
+        IFormula formula = (IFormula) featureModel;
         return  formula.printParseable();
     }
 
+    //TODO
+    /*
     public StringFormulaTree treeFromExpression(Expression formula) {
         if (formula instanceof Value) {
             return new StringFormulaTree.Leaf(formula.getName());
@@ -97,7 +98,7 @@ public class FeatJARBase implements IBase<Formula, Object> {
             }
         }
         return null;
-    }
+    }*/
 
     /**
      * transfers formula into String
@@ -105,8 +106,9 @@ public class FeatJARBase implements IBase<Formula, Object> {
      * @return HashSet of HashSets of Features as String
      */
     @Override
-    public Object smoothFormula(Formula formula) {
-        return treeFromExpression(formula).sort().getValue();
+    public Object smoothFormula(IFormula formula) {
+        //return treeFromExpression(formula).sort().getValue();
+        return null;
     }
 
     /**
@@ -116,7 +118,7 @@ public class FeatJARBase implements IBase<Formula, Object> {
      * @return Formula
      */
     @Override
-    public Formula loadFromSource(String content, String filepath) {
+    public IFormula loadFromSource(String content, String filepath) {
         // TODO
         return null;
     }
