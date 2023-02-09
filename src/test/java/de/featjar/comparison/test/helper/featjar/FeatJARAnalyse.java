@@ -212,7 +212,20 @@ public class FeatJARAnalyse implements IAnalyses<IFormula, Object> {
      */
     @Override
     public Object atomicSets(IFormula formula) {
-        return null;
+        // TODO at the moment works only for basic.xml | Error: java.util.NoSuchElementException: no object present
+        var booleanRepresentation = async(formula)
+                .map(ComputeNNFFormula::new)
+                .map(ComputeCNFFormula::new)
+                .map(ComputeBooleanRepresentationOfCNFFormula::new);
+        var booleanClauseList = getKey(booleanRepresentation);
+        var variableMap = getValue(booleanRepresentation);
+
+        var analysis = new ComputeAtomicSetsSAT4J(booleanClauseList);
+        //  parse result
+        List<Set<String>> atomicList = new ArrayList<>();
+        ComputeValueRepresentationOfSolutionList valueSolutionList = new ComputeValueRepresentationOfSolutionList(analysis, variableMap);
+        valueSolutionList.computeResult().get().forEach(valueSolution -> atomicList.add(valueSolution.getVariableNames()));
+        return atomicList;
     }
 
     /**
