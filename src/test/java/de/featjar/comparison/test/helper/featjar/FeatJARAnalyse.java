@@ -1,7 +1,11 @@
 package de.featjar.comparison.test.helper.featjar;
 
 import de.featjar.base.data.Computation;
+import de.featjar.base.data.FutureResult;
+import de.featjar.base.data.Result;
 import de.featjar.comparison.test.helper.IAnalyses;
+import de.featjar.formula.analysis.VariableMap;
+import de.featjar.formula.analysis.bool.BooleanAssignment;
 import de.featjar.formula.analysis.bool.ComputeBooleanRepresentation;
 import de.featjar.formula.analysis.sat4j.AnalyzeHasSolutionSAT4J;
 import de.featjar.formula.analysis.value.ComputeValueRepresentation;
@@ -12,6 +16,7 @@ import de.featjar.formula.transformer.ComputeNNFFormula;
 import de.featjar.formula.analysis.sat4j.AnalyzeCoreDeadVariablesSAT4J;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static de.featjar.base.data.Computations.*;
 
@@ -152,7 +157,71 @@ public class FeatJARAnalyse implements IAnalyses<Formula, Object> {
      */
     @Override
     public Object deadFeatures(Formula formula, String config) {
-        return null;
+        System.out.println(formula);
+        System.out.println(config);
+
+        var booleanRepresentation =
+                async(formula)
+                        .map(ComputeNNFFormula::new)
+                        .map(ComputeCNFFormula::new)
+                        .map(ComputeBooleanRepresentation.OfFormula::new);
+        var booleanClauseList = getKey(booleanRepresentation);
+        var variableMapComputation = getValue(booleanRepresentation);
+
+        String[] lines = config.split("\n");
+        if (lines.length < 2) {
+            System.out.println(config);
+            throw new IllegalArgumentException("Partial Config CSV requires at least two lines. Found " + lines.length + " (Line 1: Names, Line 2: Assignments)");
+        }
+
+        // WARN: Columns must not be escaped in double quotes, as the following simple parsing does not care about quoted columns.
+        String[] variableNames = lines[0].split(";");
+        String[] variableAssignments = lines[1].split(";");
+        if (variableNames.length != variableAssignments.length) {
+            throw new IllegalArgumentException("Partial Config CSV contains an unequal amount of header columns and non-header columns.");
+        }
+
+        // Create a map from name to assignment.
+        LinkedHashMap<String, Object> assignmentMap = new LinkedHashMap<>();
+        // Add all but first (description column) to map.
+        for (int i = 1; i < variableNames.length; ++i) {
+            char varChar = variableAssignments[i].charAt(0);
+            if (varChar == '+' || varChar == '-') {
+                assignmentMap.put(variableNames[i], varChar == '+');
+            }
+        }
+
+        System.out.println(assignmentMap);
+
+        var result = new AnalyzeCoreDeadVariablesSAT4J()
+                .setInput(booleanClauseList)
+                .setAssumedAssignment((Computation<BooleanAssignment>) new ValueAssignment(assignmentMap).toBoolean(variableMapComputation));
+
+        //  parse result
+        Computation<ValueAssignment> assignmentComputation = async(result, variableMapComputation).map(ComputeValueRepresentation.OfAssignment::new);
+
+        Object resultDead_;
+        try {
+            var computed = assignmentComputation.compute();
+            var core1 = computed.get().get();
+            var core = (core1 == null ? "" : core1.print());
+            // String core = computed.get().get().print();
+            String[] coreArr = core.split(", ");
+            Set<String> resultDead = new HashSet<>();
+            Arrays.stream(coreArr).forEach(feature -> {
+                if(!feature.isEmpty() && (feature.charAt(0)=='-')) {
+                    resultDead.add(feature.replace("-", ""));
+                }
+            });
+
+            // resultDead_ = resultDead;
+            resultDead_ = String.join("\n", resultDead);
+        } catch (Exception e) {
+            System.err.println("Caught exception: " + e);
+            resultDead_ = e;
+        }
+
+        return resultDead_;
     }
 
     /**
