@@ -5,6 +5,7 @@ import de.featjar.base.extension.ExtensionManager;
 import de.featjar.comparison.test.helper.IBase;
 
 import de.featjar.comparison.test.helper.tree.StringFormulaTree;
+import de.featjar.formula.analysis.value.ValueAssignment;
 import de.featjar.formula.io.FormulaFormats;
 //import de.featjar.formula.structure.Expression;
 import de.featjar.formula.structure.formula.IFormula;
@@ -13,13 +14,11 @@ import de.featjar.formula.structure.formula.predicate.Literal;
 //import de.featjar.formula.structure.formula.predicate.Predicate;
 //import de.featjar.formula.structure.term.value.Value;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -154,33 +153,16 @@ public class FeatJARBase implements IBase<IFormula, Object> {
      */
     @Override
     public String loadConfiguration(String filepath) {
-        String content = null;
+        File file = new File(filepath);
+        String result = "";
         try {
-            FileInputStream fis = new FileInputStream(filepath);
-            byte[] buffer = new byte[10];
-            StringBuilder sb = new StringBuilder();
-            while (fis.read(buffer) != -1) {
-                sb.append(new String(buffer));
-                buffer = new byte[10];
-            }
-            fis.close();
-            content = sb.toString();
+            Scanner sc = new Scanner(file);
+            while (sc.hasNextLine())
+                result += sc.nextLine();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-        Scanner scanner = new Scanner(content);
-        scanner.useDelimiter(Pattern.compile("\\n+\\Z|\\n+|\\Z"));
-        String result = null;
-        if (scanner.hasNext()) {
-            String line = scanner.next();
-            if(scanner.hasNext()) {
-                result = scanner.next();
-            } else {
-                throw new RuntimeException();
-            }
-        }
-        return result.substring(0, result.length()-2);
+        result = result.replaceAll(" ", "");
+        return result;
     }
 }

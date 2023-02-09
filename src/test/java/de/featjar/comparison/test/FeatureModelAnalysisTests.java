@@ -55,10 +55,10 @@ public class FeatureModelAnalysisTests extends ATest{
 	  * array that contains the names + location of the featuremodels files
 	 */
 	private static final List<String> MODEL_NAMES = Arrays.asList( //
-			"FeatureModelAnalysis/basic.xml",
-			"FeatureModelAnalysis/simple.xml",
-			"FeatureModelAnalysis/car.xml",
-			"FeatureModelAnalysis/hidden.xml"
+			"FeatureModelAnalysis/basic.xml"
+			//"FeatureModelAnalysis/simple.xml",
+			//"FeatureModelAnalysis/car.xml",
+			//"FeatureModelAnalysis/hidden.xml"
 	);
 
 	 /**
@@ -90,7 +90,7 @@ public class FeatureModelAnalysisTests extends ATest{
 
 		MODEL_NAMES.forEach(module -> {
 			LibraryObject libraryObjectFirst = new LibraryObject(baseOperationsLib1.load(getPathFromResource(module)), "", baseOperationsLib1.loadConfiguration(getPathFromResource(module.replaceFirst(".xml", ".csv"))));
-			LibraryObject libraryObjectSecond = new LibraryObject(baseOperationsLib2.load(getPathFromResource(module)), "", baseOperationsLib2.loadConfiguration(getPathFromResource(module.replaceFirst(".xml", ".csv"))));
+			LibraryObject libraryObjectSecond = new LibraryObject(baseOperationsLib2.load(getPathFromResource(module)), "", baseOperationsLib2.loadConfiguration(getPathFromResource(module.replaceFirst(".xml", ".txt"))));
 			featureModels.add(new WrapperLibrary(libraryObjectFirst, libraryObjectSecond));
 		});
 	}

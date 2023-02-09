@@ -112,7 +112,32 @@ public class FeatJARAnalyse implements IAnalyses<IFormula, Object> {
      */
     @Override
     public Object coreFeatures(IFormula formula, String config) {
-        return null;
+        // create valueassignment from config string
+        ValueAssignment valueAssignment = (ValueAssignment) parseConfig(config, formula.getVariableNames());
+
+        var booleanRepresentation = async(formula)
+                .map(ComputeNNFFormula::new)
+                .map(ComputeCNFFormula::new)
+                .map(ComputeBooleanRepresentationOfCNFFormula::new);
+        var booleanClauseList = getKey(booleanRepresentation);
+        var variableMap = getValue(booleanRepresentation);
+        var analysis = new ComputeCoreDeadVariablesSAT4J(booleanClauseList);
+        analysis.setAssumedAssignment(valueAssignment.toBoolean(variableMap));
+
+        //  parse result
+        ComputeValueRepresentationOfAssignment result = new ComputeValueRepresentationOfAssignment(analysis, variableMap);
+        System.out.println(result.get().get().print());
+        //TODO Error compute result
+
+        String core = result.computeResult().get().print();
+        String[] coreArr = core.split(", ");
+        Set<String> resultCore = new HashSet<>();
+        Arrays.stream(coreArr).forEach(feature -> {
+            if(!(feature.charAt(0)=='-')) {
+                resultCore.add(feature);
+            }
+        });
+        return resultCore;
     }
 
     /**
@@ -313,6 +338,20 @@ public class FeatJARAnalyse implements IAnalyses<IFormula, Object> {
      */
     @Override
     public Object parseConfig(String config, Object variables) {
-        return null;
+        String[] configArr = config.split(",");
+        LinkedHashMap<String, Object> variableValuePairs = new LinkedHashMap<>();
+        Arrays.stream(configArr).forEach(entry -> {
+            if(entry.charAt(0) == '-') {
+                variableValuePairs.put(entry.substring(1), false);
+            } else {
+                variableValuePairs.put(entry, true);
+            }
+        });
+        /*
+        LinkedHashSet<String> variableNames = (LinkedHashSet<String>) variables;
+        variableNames.forEach(name -> {
+            if(!variableValuePairs.containsKey(name)) variableValuePairs.put(name, null);
+        });*/
+        return new ValueAssignment(variableValuePairs);
     }
 }
