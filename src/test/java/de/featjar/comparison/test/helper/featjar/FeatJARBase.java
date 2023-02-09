@@ -148,9 +148,9 @@ public class FeatJARBase implements IBase<Formula, Object> {
         scanner.useDelimiter(Pattern.compile("\\n+\\Z|\\n+|\\Z"));
         String result = null;
         if (scanner.hasNext()) {
-            String line = scanner.next();
+            result = scanner.next();
             if(scanner.hasNext()) {
-                result = scanner.next();
+                result += "\n" + scanner.next();
             } else {
                 throw new RuntimeException();
             }
