@@ -1,19 +1,8 @@
 package de.featjar.comparison.test.helper.featjar;
 
-<<<<<<< HEAD
-import de.featjar.base.data.Computation;
-import de.featjar.base.data.FutureResult;
-import de.featjar.base.data.Result;
-import de.featjar.comparison.test.helper.IAnalyses;
-import de.featjar.formula.analysis.VariableMap;
 import de.featjar.formula.analysis.bool.BooleanAssignment;
-import de.featjar.formula.analysis.bool.ComputeBooleanRepresentation;
-import de.featjar.formula.analysis.sat4j.AnalyzeHasSolutionSAT4J;
-import de.featjar.formula.analysis.value.ComputeValueRepresentation;
-=======
 import de.featjar.base.computation.Computations;
 import de.featjar.base.computation.ComputePresence;
-import de.featjar.cli.analysis.ComputeSolutionCountSharpSAT;
 import de.featjar.comparison.test.helper.IAnalyses;
 import de.featjar.formula.analysis.bool.BooleanSolution;
 import de.featjar.formula.analysis.bool.ComputeBooleanRepresentationOfCNFFormula;
@@ -23,14 +12,12 @@ import de.featjar.formula.analysis.sat4j.ComputeSolutionCountSAT4J;
 import de.featjar.formula.analysis.sat4j.ComputeSolutionSAT4J;
 import de.featjar.formula.analysis.value.ComputeValueRepresentationOfAssignment;
 import de.featjar.formula.analysis.value.ComputeValueRepresentationOfSolutionList;
->>>>>>> b7a774bb9054852a4c65f1be85e943fe42e0342b
 import de.featjar.formula.analysis.value.ValueAssignment;
 import de.featjar.formula.structure.formula.IFormula;
 import de.featjar.formula.transformer.ComputeCNFFormula;
 import de.featjar.formula.transformer.ComputeNNFFormula;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static de.featjar.base.computation.Computations.*;
 
