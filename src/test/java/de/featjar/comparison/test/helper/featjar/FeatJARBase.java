@@ -8,10 +8,11 @@ import de.featjar.comparison.test.helper.tree.StringFormulaTree;
 import de.featjar.formula.analysis.value.ValueAssignment;
 import de.featjar.formula.io.FormulaFormats;
 //import de.featjar.formula.structure.Expression;
-import de.featjar.formula.structure.Expressions;
+import de.featjar.formula.structure.IExpression;
 import de.featjar.formula.structure.formula.IFormula;
 import de.featjar.formula.structure.formula.connective.*;
 import de.featjar.formula.structure.formula.predicate.Literal;
+import de.featjar.formula.structure.term.value.IValue;
 //import de.featjar.formula.structure.formula.predicate.Predicate;
 //import de.featjar.formula.structure.term.value.Value;
 
@@ -63,10 +64,8 @@ public class FeatJARBase implements IBase<IFormula, IConnective> {
         return  formula.printParseable();
     }
 
-    //TODO
-    /*
-    public StringFormulaTree treeFromExpression(Expression formula) {
-        if (formula instanceof Value) {
+    public StringFormulaTree treeFromExpression(IExpression formula) {
+        if (formula instanceof IValue) {
             return new StringFormulaTree.Leaf(formula.getName());
         } else if (formula instanceof Literal) {
             // Make "not" out of literal.
@@ -101,7 +100,7 @@ public class FeatJARBase implements IBase<IFormula, IConnective> {
             }
         }
         return null;
-    }*/
+    }
 
     /**
      * transfers formula into String
@@ -110,8 +109,7 @@ public class FeatJARBase implements IBase<IFormula, IConnective> {
      */
     @Override
     public Object smoothFormula(IFormula formula) {
-        //return treeFromExpression(formula).sort().getValue();
-        return null;
+        return treeFromExpression(formula).sort().getValue();
     }
 
     /**
@@ -156,15 +154,25 @@ public class FeatJARBase implements IBase<IFormula, IConnective> {
     @Override
     public String loadConfiguration(String filepath) {
         File file = new File(filepath);
-        String result = "";
+        String content = "";
         try {
             Scanner sc = new Scanner(file);
             while (sc.hasNextLine())
-                result += sc.nextLine();
+                content += sc.nextLine();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        result = result.replaceAll(" ", "");
-        return result;
+        Scanner scanner = new Scanner(content);
+        scanner.useDelimiter(Pattern.compile("\\n+\\Z|\\n+|\\Z"));
+        String result = null;
+        if (scanner.hasNext()) {
+            result = scanner.next();
+            if(scanner.hasNext()) {
+                result += "\n" + scanner.next();
+            } else {
+                throw new RuntimeException();
+            }
+        }
+        return result.substring(0, result.length()-2);
     }
 }
