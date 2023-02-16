@@ -10,16 +10,15 @@ import de.featjar.formula.analysis.sat4j.ComputeAtomicSetsSAT4J;
 import de.featjar.formula.analysis.sat4j.ComputeCoreDeadVariablesSAT4J;
 import de.featjar.formula.analysis.sat4j.ComputeSolutionCountSAT4J;
 import de.featjar.formula.analysis.sat4j.ComputeSolutionSAT4J;
-import de.featjar.formula.analysis.value.ComputeValueRepresentationOfAssignment;
-import de.featjar.formula.analysis.value.ComputeValueRepresentationOfSolutionList;
-import de.featjar.formula.analysis.value.ValueAssignment;
+import de.featjar.formula.analysis.value.*;
 import de.featjar.formula.structure.formula.IFormula;
+import de.featjar.formula.structure.formula.connective.IConnective;
 import de.featjar.formula.transformer.ComputeCNFFormula;
 import de.featjar.formula.transformer.ComputeNNFFormula;
-
 import java.util.*;
 
 import static de.featjar.base.computation.Computations.*;
+
 
 /**
  * This class contains all analyses of the FeatJAR library.
@@ -29,7 +28,7 @@ import static de.featjar.base.computation.Computations.*;
  * @see de.featjar.comparison.test.FeatureModelAnalysisTests
  * @see IAnalyses
  */
-public class FeatJARAnalyse implements IAnalyses<IFormula, Object> {
+public class FeatJARAnalyse implements IAnalyses<IFormula, IConnective> {
     /**
      * not implemented yet
      * checks whether featuremodel is true under all interpretations
@@ -38,8 +37,18 @@ public class FeatJARAnalyse implements IAnalyses<IFormula, Object> {
      * @return true or false
      */
     @Override
-    public Object isTautology(IFormula formula, Object query) {
-        return null;
+    public Object isTautology(IFormula formula, IConnective query) {
+        formula.addChild(query);
+        boolean isvoid = async(formula)
+                .map(ComputeNNFFormula::new)
+                .map(ComputeCNFFormula::new)
+                .map(ComputeBooleanRepresentationOfCNFFormula::new)
+                .map(Computations::getKey)
+                .map(ComputeSolutionSAT4J::new)
+                .map(ComputePresence<BooleanSolution>::new)
+                .get()
+                .get();
+        return isvoid;
     }
 
     /**

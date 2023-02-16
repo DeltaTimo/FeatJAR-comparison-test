@@ -8,6 +8,7 @@ import de.featjar.comparison.test.helper.tree.StringFormulaTree;
 import de.featjar.formula.analysis.value.ValueAssignment;
 import de.featjar.formula.io.FormulaFormats;
 //import de.featjar.formula.structure.Expression;
+import de.featjar.formula.structure.Expressions;
 import de.featjar.formula.structure.formula.IFormula;
 import de.featjar.formula.structure.formula.connective.*;
 import de.featjar.formula.structure.formula.predicate.Literal;
@@ -22,6 +23,9 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static de.featjar.formula.structure.Expressions.*;
+import static de.featjar.formula.structure.Expressions.literal;
+
 /**
  * This class contains all base operations of the FeatJAR library.
  * The interface IBase<Formula, Object> is implemented and the analyses are
@@ -30,7 +34,7 @@ import java.util.stream.Collectors;
  * @see de.featjar.comparison.test.FeatureModelBaseTests
  * @see IBase
  */
-public class FeatJARBase implements IBase<IFormula, Object> {
+public class FeatJARBase implements IBase<IFormula, IConnective> {
     protected final ExtensionManager extensionManager = new ExtensionManager();
 
     // close Extensionmanager
@@ -129,9 +133,8 @@ public class FeatJARBase implements IBase<IFormula, Object> {
      * @return implies query of feature a and b
      */
     @Override
-    public Object createQueryImpl(String feature1, String feature2) {
-        // TODO
-        return null;
+    public IConnective createQueryImpl(String feature1, String feature2) {
+        return implies(literal(feature1), literal(feature2));
     }
 
     /**
@@ -141,9 +144,8 @@ public class FeatJARBase implements IBase<IFormula, Object> {
      * @return and not query of feature a and b
      */
     @Override
-    public Object createQueryAndNot(String feature1, String feature2) {
-        // TODO
-        return null;
+    public IConnective createQueryAndNot(String feature1, String feature2) {
+        return and(literal(feature1), not(literal(feature2)));
     }
 
     /**

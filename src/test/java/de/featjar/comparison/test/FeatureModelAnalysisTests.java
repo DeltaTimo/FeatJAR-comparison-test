@@ -29,6 +29,7 @@ import de.featjar.comparison.test.helper.featjar.FeatJARBase;
 import de.featjar.comparison.test.helper.featureide.FeatureIDEAnalyse;
 import de.featjar.comparison.test.helper.featureide.FeatureIDEBase;
 import de.featjar.formula.structure.formula.IFormula;
+import de.featjar.formula.structure.formula.connective.IConnective;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -55,10 +56,10 @@ public class FeatureModelAnalysisTests extends ATest{
 	  * array that contains the names + location of the featuremodels files
 	 */
 	private static final List<String> MODEL_NAMES = Arrays.asList( //
-			"FeatureModelAnalysis/basic.xml"
-			//"FeatureModelAnalysis/simple.xml",
-			//"FeatureModelAnalysis/car.xml",
-			//"FeatureModelAnalysis/hidden.xml"
+			"FeatureModelAnalysis/basic.xml",
+			"FeatureModelAnalysis/simple.xml",
+			"FeatureModelAnalysis/car.xml",
+			"FeatureModelAnalysis/hidden.xml"
 	);
 
 	 /**
@@ -111,7 +112,7 @@ public class FeatureModelAnalysisTests extends ATest{
 
 		map.entrySet()
 				.stream()
-				.forEach(entry -> assertEquals(run(() -> library1.isTautology((IFeatureModel) entry.getKey().getObjectLib1().getFeatureModel(), (Node) entry.getValue().getObjectLib1())), run(() -> library2.isTautology((IFormula) entry.getKey().getObjectLib2().getFeatureModel(), entry.getValue().getObjectLib2()))));
+				.forEach(entry -> assertEquals(run(() -> library1.isTautology((IFeatureModel) entry.getKey().getObjectLib1().getFeatureModel(), (Node) entry.getValue().getObjectLib1())), run(() -> library2.isTautology((IFormula) entry.getKey().getObjectLib2().getFeatureModel(), (IConnective) entry.getValue().getObjectLib2()))));
 	}
 
 	@Test
