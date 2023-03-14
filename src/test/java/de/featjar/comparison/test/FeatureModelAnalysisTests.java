@@ -91,7 +91,7 @@ public class FeatureModelAnalysisTests extends ATest{
 
 		MODEL_NAMES.forEach(module -> {
 			LibraryObject libraryObjectFirst = new LibraryObject(baseOperationsLib1.load(getPathFromResource(module)), "", baseOperationsLib1.loadConfiguration(getPathFromResource(module.replaceFirst(".xml", ".csv"))));
-			LibraryObject libraryObjectSecond = new LibraryObject(baseOperationsLib2.load(getPathFromResource(module)), "", baseOperationsLib2.loadConfiguration(getPathFromResource(module.replaceFirst(".xml", ".txt"))));
+			LibraryObject libraryObjectSecond = new LibraryObject(baseOperationsLib2.load(getPathFromResource(module)), "", baseOperationsLib2.loadConfiguration(getPathFromResource(module.replaceFirst(".xml", ".csv"))));
 			featureModels.add(new WrapperLibrary(libraryObjectFirst, libraryObjectSecond));
 		});
 	}

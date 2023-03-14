@@ -153,13 +153,20 @@ public class FeatJARBase implements IBase<IFormula, IConnective> {
      */
     @Override
     public String loadConfiguration(String filepath) {
-        File file = new File(filepath);
-        String content = "";
+        String content = null;
         try {
-            Scanner sc = new Scanner(file);
-            while (sc.hasNextLine())
-                content += sc.nextLine();
+            FileInputStream fis = new FileInputStream(filepath);
+            byte[] buffer = new byte[10];
+            StringBuilder sb = new StringBuilder();
+            while (fis.read(buffer) != -1) {
+                sb.append(new String(buffer));
+                buffer = new byte[10];
+            }
+            fis.close();
+            content = sb.toString();
         } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
         Scanner scanner = new Scanner(content);
