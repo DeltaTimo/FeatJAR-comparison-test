@@ -2,7 +2,6 @@ package de.featjar.comparison.test.helper.featjar;
 
 import de.featjar.base.computation.Computations;
 import de.featjar.base.computation.ComputePresence;
-import de.featjar.cli.analysis.ComputeSolutionCountSharpSAT;
 import de.featjar.comparison.test.helper.IAnalyses;
 import de.featjar.formula.analysis.bool.BooleanSolution;
 import de.featjar.formula.analysis.bool.ComputeBooleanRepresentationOfCNFFormula;
